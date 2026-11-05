@@ -19,9 +19,16 @@ Usage:
 """
 
 import os
+import sys
 import argparse
 import time
 from typing import Tuple, Dict, Any, Optional, List
+
+# Ensure repository root is on Python sys.path
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -257,7 +264,16 @@ def train_edge_model(
     output_dir: str = "checkpoints/indipalm_edge",
 ):
     os.makedirs(output_dir, exist_ok=True)
-    device = torch.device(device if torch.cuda.is_available() and device == "cuda" else "cpu")
+    device_obj = torch.device(device if torch.cuda.is_available() and device == "cuda" else "cpu")
+    if device_obj.type == "cuda":
+        torch.backends.cudnn.benchmark = True
+        gpu_name = torch.cuda.get_device_name(0)
+        vram_gb = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+        print(f"[*] GPU Acceleration Active: {gpu_name} ({vram_gb:.1f} GB VRAM)")
+    else:
+        print(f"[*] Executing on device: {device_obj}")
+
+    device = device_obj
     print(f"[*] Initializing IndiPalm-Edge Recognition Training on device: {device}")
     print(f"    - Training Identities:   {num_classes:,} ({num_classes * samples_per_id:,} presentations)")
     print(f"    - Open-Set Val Identities: {val_classes:,} ({val_classes * samples_per_id:,} presentations - UNSEEN)")
