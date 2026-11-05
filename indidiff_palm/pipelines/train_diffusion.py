@@ -236,7 +236,7 @@ def train_diffusion(
         )
         print(f"    Checkpoint saved to {ckpt_path}")
 
-    print(f"[✓] IndiDiff-Palm foundation training complete. Models saved in {output_dir}")
+    print(f"[+] IndiDiff-Palm foundation training complete. Models saved in {output_dir}")
 
 
 if __name__ == "__main__":

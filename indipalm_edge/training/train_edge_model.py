@@ -407,7 +407,7 @@ def train_edge_model(
     model.backbone.reparameterize()
     deploy_path = os.path.join(output_dir, "indipalm_edge_deploy_fused.pt")
     torch.save(model.state_dict(), deploy_path)
-    print(f"[✓] Deployment-ready fused edge model saved to: {deploy_path}")
+    print(f"[+] Deployment-ready fused edge model saved to: {deploy_path}")
 
 
 if __name__ == "__main__":
