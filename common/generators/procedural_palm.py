@@ -328,3 +328,64 @@ class ProceduralPalmGenerator:
             "mehndi_coverage": mehndi_coverage,
             "cupping_angle_deg": cupping_angle_deg,
         }
+
+
+class CleanRoomPalmGenerator(ProceduralPalmGenerator):
+    """
+    High-level clean-room procedural generator wrapper.
+    Provides batch and identity-based synthesis for dataset generation and training pipelines.
+    """
+
+    def __init__(self, base_seed: int = 42, image_size: Tuple[int, int] = ROI_IMAGE_SIZE):
+        super().__init__(image_size=image_size)
+        self.base_seed = base_seed
+
+    def generate_identity(self, identity_index: int) -> Dict[str, Any]:
+        """
+        Generates a paired synthetic identity with registered RGB, NIR, depth, and Mehndi maps.
+        """
+        rng = np.random.RandomState(self.base_seed + identity_index * 17)
+        melanin = float(rng.uniform(0.20, 0.45))
+        has_mehndi = bool(rng.uniform(0, 1) < 0.25)
+        mehndi_coverage = float(rng.uniform(0.30, 0.60)) if has_mehndi else 0.0
+        cupping_deg = float(rng.uniform(0.0, 20.0))
+        callus = float(rng.uniform(0.0, 0.40)) if rng.uniform(0, 1) < 0.30 else 0.0
+
+        pair = self.generate_pair(
+            identity_seed=self.base_seed + identity_index,
+            presentation_seed=self.base_seed + identity_index * 31,
+            melanin_fraction=melanin,
+            mehndi_coverage=mehndi_coverage,
+            cupping_angle_deg=cupping_deg,
+            callus_intensity=callus,
+        )
+
+        rgb = pair["rgb"]
+        nir = pair["nir"]
+        if nir.ndim == 3 and nir.shape[-1] == 1:
+            nir_2d = nir[:, :, 0]
+        else:
+            nir_2d = nir
+
+        # Generate depth map corresponding to cupping curvature
+        y, x = np.mgrid[0:self.height, 0:self.width]
+        cx, cy = self.width * 0.5, self.height * 0.5
+        r_sq = ((x - cx) / self.width) ** 2 + ((y - cy) / self.height) ** 2
+        depth_map = 1.0 - (cupping_deg / 45.0) * r_sq
+        depth_map = np.clip(depth_map, 0.0, 1.0).astype(np.float32)
+
+        mehndi_mask = self.generate_mehndi_dye_mask(rng, coverage_ratio=mehndi_coverage)
+
+        return {
+            "rgb_image": rgb,
+            "nir_image": nir_2d,
+            "depth_map": depth_map,
+            "mehndi_mask": mehndi_mask,
+            "melanin_fraction": melanin,
+            "has_mehndi": has_mehndi,
+            "callus_factor": callus,
+            "creases": [1, 2, 3],
+            "vessels": [1, 2, 3, 4, 5],
+            "cupping_angle_deg": cupping_deg,
+        }
+

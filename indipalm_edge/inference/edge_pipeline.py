@@ -177,8 +177,9 @@ class SovereignEdgeInferenceEngine(nn.Module):
         emb_np = invariant_embedding.detach().cpu().numpy()[0]
         # Generate permutation hash indices
         iom_indices = self.iom_urp.hash_embedding(emb_np)
-        # Map into 1024-bit Bloom filter
+        # Map into 1024-bit Bloom filter and pack into 128 bytes
         bloom_token = self.bloom_tokenizer.tokenize_indices(iom_indices)
+        packed_bytes = np.packbits(bloom_token, bitorder="little")
         profiling["cancellable_tokenization_ms"] = (time.perf_counter() - t0) * 1000.0
 
         total_elapsed_ms = (time.perf_counter() - t_pipeline_start) * 1000.0
@@ -188,8 +189,8 @@ class SovereignEdgeInferenceEngine(nn.Module):
             "status": "AUTHENTICATION_READY",
             "authorized": True,
             "merchant_id": merchant_id,
-            "token": bloom_token,  # 1024-bit binary array (128 bytes)
-            "token_hex": bloom_token.tobytes().hex(),
+            "token": bloom_token,  # 1024-bit binary array
+            "token_hex": packed_bytes.tobytes().hex(),  # 128 bytes = 256 hex characters
             "pad_liveness": pad_result,
             "dynamic_fusion_mask_mean": float(dynamic_mask.mean().item()),
             "profiling_ms": {k: round(v, 3) for k, v in profiling.items()},

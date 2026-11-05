@@ -100,3 +100,32 @@ class IndexOfMaxHasher:
         matches = np.sum(indices_a == indices_b)
         return float(matches / len(indices_a))
 
+    def hash_embedding(self, embedding: np.ndarray) -> np.ndarray:
+        """Alias for hash()."""
+        return self.hash(embedding)
+
+
+class IndexOfMaxURP(IndexOfMaxHasher):
+    """
+    Subclass / alias providing flexible parameter names (feature_dim, num_hashes, permutation_length).
+    """
+
+    def __init__(
+        self,
+        feature_dim: int = FEATURE_EMBEDDING_DIM,
+        num_hashes: int = IOM_NUM_HASHES_K,
+        permutation_length: int = IOM_SUBSET_SIZE_M,
+        seed: int = 42,
+        **kwargs,
+    ):
+        emb_dim = kwargs.get("embedding_dim", feature_dim)
+        num_k = kwargs.get("num_hashes_k", num_hashes)
+        sub_m = kwargs.get("subset_size_m", permutation_length)
+        super().__init__(
+            embedding_dim=emb_dim,
+            num_hashes_k=num_k,
+            subset_size_m=sub_m,
+            seed=seed,
+        )
+
+

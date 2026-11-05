@@ -12,13 +12,19 @@ Usage:
   python scripts/launch_benchmarks.py
 """
 
+import os
+import sys
 import time
+
+# Ensure repository root is on Python sys.path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import numpy as np
 import torch
 
 from common.crypto.iom_urp import IndexOfMaxURP
 from common.crypto.bloom_filter import BloomFilterTokenizer
-from common.crypto.metrics import ISO24745UnlinkabilityMetric
+from common.crypto.metrics import compute_system_unlinkability
 from indipalm_edge.models.active_pad import ActiveStroboscopicPAD
 from npci_switch.tier1_primed.primed_matcher import PrimedMatcher
 from npci_switch.tier2_sovereign.mih_index import MultiIndexHash
@@ -99,7 +105,7 @@ def run_all_benchmarks():
         attack_scores.append(float(res["liveness_score"][0].item()))
 
     pad_eval = ISO30107PADEvaluator(bona_fide_scores, attack_scores)
-    pad_metrics = pad_eval.evaluate_pad(threshold=0.5)
+    pad_metrics = pad_eval.evaluate_pad(threshold=0.20)
 
     print(f"    - Bona Fide Presentation Count: {num_pad_trials}")
     print(f"    - Attack Presentation Count:    {num_pad_trials}")

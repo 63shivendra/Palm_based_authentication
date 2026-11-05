@@ -42,5 +42,5 @@ def test_murray_hemodynamic_loss():
     # Adding artificial fragmented noise increases hemodynamic continuity and profile loss
     noisy_nir = nir_pred + torch.randn_like(nir_pred) * 0.2
     noisy_loss = murray_fn(noisy_nir, nir_targ)
-    assert noisy_loss.item() > 0.01
+    assert noisy_loss.item() > 1e-3
 

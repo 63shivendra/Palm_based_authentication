@@ -89,3 +89,4 @@ def test_edge_model_training_step():
     # Test structural reparameterization
     model.backbone.reparameterize()
     assert model.backbone.rgb_stream.stem[0].deploy is True
+

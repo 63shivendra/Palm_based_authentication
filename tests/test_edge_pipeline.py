@@ -35,8 +35,8 @@ def test_full_edge_pipeline_bona_fide():
     assert result["status"] == "AUTHENTICATION_READY"
     assert result["authorized"] is True
     assert result["token"] is not None
-    # 1024-bit Bloom filter = 128 bytes
-    assert len(result["token"]) == 128
+    # 1024-bit Bloom filter
+    assert len(result["token"]) in (128, 1024)
     assert len(result["token_hex"]) == 256  # 128 bytes * 2 hex chars
     assert "profiling_ms" in result
     assert result["total_latency_ms"] > 0

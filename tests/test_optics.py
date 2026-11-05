@@ -84,22 +84,20 @@ def test_active_differential_pad_liveness():
     assert DELTA_PAD_LIVING_MIN <= delta_living <= DELTA_PAD_LIVING_MAX
 
     # 2. Silicone / Paper presentation attack spoof:
-    # Inorganic material has flat spectral reflectance, but CMOS QE still scales 850 nm vs 940 nm.
-    # The ISP normalizes for quantum efficiency (alpha = 1.05 * eta_qe_850 / eta_qe_940).
+    # Inorganic material has flat spectral reflectance across 850 nm and 940 nm
     sig_850_spoof = compute_sensor_detected_signal(850.0, is_living=False)
     sig_940_spoof = compute_sensor_detected_signal(940.0, is_living=False)
 
     spoof_850 = rng.normal(loc=sig_850_spoof, scale=2.0, size=(64, 64))
     spoof_940 = rng.normal(loc=sig_940_spoof, scale=2.0, size=(64, 64))
 
-    # Balancing factor compensates for sensor QE
-    alpha_calibrated = (0.28 / 0.15)
-    delta_spoof = compute_differential_pad_ratio(spoof_850, spoof_940, alpha=alpha_calibrated)
+    delta_spoof = compute_differential_pad_ratio(spoof_850, spoof_940)
     is_spoof_live, spoof_verdict = verify_liveness_iso30107(delta_spoof)
 
     assert is_spoof_live is False
     assert spoof_verdict == "PRESENTATION_ATTACK_SPOOF_FLAT_SPECTRUM"
     assert abs(delta_spoof) <= DELTA_PAD_SPOOF_MAX
+
 
 
 def test_lawsone_dye_wavelength_decoupling():

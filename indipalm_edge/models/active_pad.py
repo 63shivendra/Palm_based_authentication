@@ -120,8 +120,11 @@ class ActiveStroboscopicPAD(nn.Module):
         edge_map = F.conv2d(luminance, laplacian_kernel, padding=1)
         edge_var = edge_map.var(dim=[1, 2, 3])
 
-        # Specular score combining high-luminance saturation and edge variance
-        specular_score = torch.clamp(saturated_pixels * 5.0 + edge_var * 2.0, 0.0, 1.0)
+        # Specular score combining high-luminance saturation hot spots and edge variance
+        has_saturated_spot = ((luminance > 0.95).float().sum(dim=[1, 2, 3]) > 100).float()
+        specular_score = torch.clamp(
+            has_saturated_spot * 0.70 + saturated_pixels * 10.0 + edge_var * 2.0, 0.0, 1.0
+        )
         return specular_score
 
     def calibrate_demographic_thresholds(

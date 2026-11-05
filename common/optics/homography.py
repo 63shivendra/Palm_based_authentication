@@ -121,6 +121,16 @@ class ClosedLoopHomographyEngine:
         # Normalize homography so H[2, 2] = 1.0
         return homography / (homography[2, 2] + 1e-12)
 
+    def compute_homography_matrix(
+        self,
+        standoff_z_mm: float,
+        tilt_drift_deg: Tuple[float, float, float] = (0.0, 0.0, 0.0),
+        palmar_normal: Tuple[float, float, float] = (0.0, 0.0, 1.0),
+    ) -> np.ndarray:
+        """Alias for get_homography."""
+        return self.get_homography(standoff_z_mm, tilt_drift_deg, palmar_normal)
+
+
     def warp_coordinates(self, coords_rgb: np.ndarray, homography: np.ndarray) -> np.ndarray:
         """
         Projects (x, y) 2D pixel coordinates from RGB sensor plane to NIR sensor plane.

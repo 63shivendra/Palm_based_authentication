@@ -82,9 +82,10 @@ class LocalitySensitiveBloomFilter:
         bitwise operations.
         """
         assert len(bloom_vector) == self.filter_length
-        # Reshape into (num_words, 64) and convert bits to uint64 words
-        packed = np.packbits(bloom_vector.reshape(-1, 8), axis=1, bitorder="little")
-        return packed.view(np.uint64).flatten()
+        # Pack 1024 binary bits into 128 uint8 bytes, then view as 16 uint64 words
+        packed_bytes = np.packbits(bloom_vector, bitorder="little")
+        return packed_bytes.view(np.uint64)
+
 
     @staticmethod
     def hamming_distance(packed_a: np.ndarray, packed_b: np.ndarray) -> int:
@@ -104,4 +105,30 @@ class LocalitySensitiveBloomFilter:
     def hamming_distance_unpacked(vector_a: np.ndarray, vector_b: np.ndarray) -> int:
         """Computes Hamming distance directly on unpacked uint8 arrays."""
         return int(np.sum(vector_a != vector_b))
+
+    def tokenize_indices(self, ordinal_indices: np.ndarray) -> np.ndarray:
+        """Alias for tokenize() to accept ordinal index arrays."""
+        return self.tokenize(ordinal_indices)
+
+
+class BloomFilterTokenizer(LocalitySensitiveBloomFilter):
+    """
+    Subclass / alias providing flexible parameter names (filter_size_bits, num_hash_functions).
+    """
+
+    def __init__(
+        self,
+        filter_size_bits: int = BLOOM_FILTER_LENGTH_BITS,
+        num_hash_functions: int = 3,
+        seed: int = 1337,
+        **kwargs,
+    ):
+        filter_length = kwargs.get("filter_length", filter_size_bits)
+        num_h = kwargs.get("num_hash_functions_h", num_hash_functions)
+        super().__init__(
+            filter_length=filter_length,
+            num_hash_functions_h=num_h,
+            seed=seed,
+        )
+
 

@@ -240,3 +240,4 @@ if __name__ == "__main__":
         device=args.device,
         output_dir=args.output_dir,
     )
+

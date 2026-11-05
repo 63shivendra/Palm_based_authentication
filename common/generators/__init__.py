@@ -2,7 +2,6 @@
 IndiPalm-SovereignNet: Procedural clean-room synthetic generation.
 """
 
-from .procedural_palm import ProceduralPalmGenerator
+from .procedural_palm import ProceduralPalmGenerator, CleanRoomPalmGenerator
 
-__all__ = ["ProceduralPalmGenerator"]
-
+__all__ = ["ProceduralPalmGenerator", "CleanRoomPalmGenerator"]

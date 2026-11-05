@@ -13,8 +13,13 @@ Usage:
 """
 
 import os
+import sys
 import argparse
 import json
+
+# Ensure repository root is on Python sys.path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import numpy as np
 from PIL import Image
 

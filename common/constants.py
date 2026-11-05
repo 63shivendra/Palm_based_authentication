@@ -84,3 +84,26 @@ EDGE_MEASURED_TARGET_MS: float = 30.1       # Profiling target latency on VeriSi
 EDGE_POWER_BUDGET_WATTS: float = 3.5        # Maximum thermal power dissipation (Watts)
 ROI_IMAGE_SIZE: Tuple[int, int] = (128, 128)# Standardized palm ROI resolution (pixels)
 
+# ==============================================================================
+# Canonical System Constants & Aliases
+# ==============================================================================
+PALM_ROI_SIZE: Tuple[int, int] = (128, 128)
+EMBEDDING_DIM: int = FEATURE_EMBEDDING_DIM
+BLOOM_FILTER_SIZE_BITS: int = BLOOM_FILTER_LENGTH_BITS
+IOM_NUM_HASH_FUNCTIONS: int = IOM_NUM_HASHES_K
+EDGE_MAX_TOTAL_LATENCY_MS: float = EDGE_LATENCY_BUDGET_MS
+
+PAD_DIFFERENTIAL_MIN: float = DELTA_PAD_LIVING_MIN
+PAD_DIFFERENTIAL_MAX: float = DELTA_PAD_LIVING_MAX
+PAD_MAX_ACER: float = 0.0010                # Target ACER < 0.10%
+
+NIR_WAVELENGTH_PRIMARY_NM: float = WAVELENGTH_NIR_PRIMARY
+NIR_WAVELENGTH_SECONDARY_NM: float = WAVELENGTH_NIR_SECONDARY
+FAR_TARGET_STRICT: float = BANKING_FRAUD_FAR_CEILING
+FRR_TARGET_EDGE: float = CUSTOMER_EXPERIENCE_FRR_CEILING
+
+FITZPATRICK_SKIN_TYPES = ["Type-IV", "Type-V", "Type-VI"]
+MURRAY_LAW_EXPONENT: float = 3.0
+HEMODYNAMIC_PRESSURE_DROP_EXPONENT: float = 4.0
+
+
