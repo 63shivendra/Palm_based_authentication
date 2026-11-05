@@ -5,3 +5,4 @@ from benchmarks.iso_iec_evaluator import (
 )
 
 __all__ = ["ISO19795AccuracyEvaluator", "ISO30107PADEvaluator"]
+

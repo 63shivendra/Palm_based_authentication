@@ -77,3 +77,4 @@ def test_demographic_calibration_fitzpatrick():
 
     # Fitzpatrick VI should have a more accommodating lower threshold to prevent demographic false rejections
     assert float(tau_min6.item()) < float(tau_min4.item())
+

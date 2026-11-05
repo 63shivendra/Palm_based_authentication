@@ -371,3 +371,4 @@ class RepMSFNet(nn.Module):
         """Reparameterizes both RGB and NIR streams for zero-latency deployment."""
         self.rgb_stream.reparameterize()
         self.nir_stream.reparameterize()
+

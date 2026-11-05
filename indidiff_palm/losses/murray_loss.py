@@ -141,3 +141,4 @@ class MurrayHemodynamicLoss(nn.Module):
             + self.lambda_bifurcation * murray_conservation_loss
         )
         return total_loss
+

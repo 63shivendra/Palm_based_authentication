@@ -200,3 +200,4 @@ class ActiveStroboscopicPAD(nn.Module):
             "tau_min": tau_min,
             "tau_max": tau_max,
         }
+

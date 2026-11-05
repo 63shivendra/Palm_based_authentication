@@ -93,3 +93,4 @@ class WaveletDirectionalLoss(nn.Module):
             curr_target = ll_targ
 
         return total_loss
+

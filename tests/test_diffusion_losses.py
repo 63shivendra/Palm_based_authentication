@@ -43,3 +43,4 @@ def test_murray_hemodynamic_loss():
     noisy_nir = nir_pred + torch.randn_like(nir_pred) * 0.2
     noisy_loss = murray_fn(noisy_nir, nir_targ)
     assert noisy_loss.item() > 0.01
+

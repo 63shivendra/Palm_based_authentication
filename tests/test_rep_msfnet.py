@@ -91,3 +91,4 @@ def test_rep_msfnet_full_pipeline():
     # L2 normalized on unit sphere S^511
     norms = torch.norm(emb, p=2, dim=1)
     assert torch.allclose(norms, torch.ones_like(norms), atol=1e-5)
+

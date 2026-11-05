@@ -93,3 +93,4 @@ class ISO30107PADEvaluator:
             "threshold": threshold,
             "passes_iso_target": acer < 0.0010,  # ACER < 0.10%
         }
+

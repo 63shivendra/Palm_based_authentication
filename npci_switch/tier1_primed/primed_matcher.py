@@ -100,3 +100,4 @@ class PrimedMatcher:
             "latency_ms": round(latency_ms, 3),
             "tier": "Tier-1-Primed-1:1",
         }
+

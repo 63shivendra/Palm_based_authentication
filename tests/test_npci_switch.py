@@ -105,3 +105,4 @@ def test_upi_iso20022_message_generation():
     assert msg["CreditTransferTransactionInformation"]["BiometricAuthenticationReceipt"]["Status"] == "SUCCESS_VERIFIED"
     assert "DigitalSignature" in msg
     assert len(msg["DigitalSignature"]["Digest"]) == 64  # SHA-256 hex length
+

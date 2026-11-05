@@ -171,3 +171,4 @@ class MultiIndexHash:
             "total_latency_ms": round(total_latency_ms, 3),
             "tier": "Tier-2-Sovereign-1:N",
         }
+
