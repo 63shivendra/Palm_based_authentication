@@ -268,6 +268,89 @@ class ProceduralPalmGenerator:
             return image[sample_y, sample_x, :]
         return image[sample_y, sample_x]
 
+    def apply_3d_pose_warp(
+        self,
+        image: np.ndarray,
+        pitch_deg: float = 0.0,
+        roll_deg: float = 0.0,
+        yaw_deg: float = 0.0,
+        focal_length_px: float = 300.0,
+    ) -> np.ndarray:
+        """
+        Applies rigorous 3D projective perspective foreshortening around the center of the palm.
+        Simulates compound presentation angles (pitch, roll, yaw in [-25°, +25°]).
+        """
+        if abs(pitch_deg) < 0.5 and abs(roll_deg) < 0.5 and abs(yaw_deg) < 0.5:
+            return image
+
+        h, w = self.height, self.width
+        cx, cy = w * 0.5, h * 0.5
+
+        rx = np.radians(pitch_deg)
+        ry = np.radians(roll_deg)
+        rz = np.radians(yaw_deg)
+
+        Rx = np.array([[1, 0, 0], [0, np.cos(rx), -np.sin(rx)], [0, np.sin(rx), np.cos(rx)]], dtype=np.float32)
+        Ry = np.array([[np.cos(ry), 0, np.sin(ry)], [0, 1, 0], [-np.sin(ry), 0, np.cos(ry)]], dtype=np.float32)
+        Rz = np.array([[np.cos(rz), -np.sin(rz), 0], [np.sin(rz), np.cos(rz), 0], [0, 0, 1]], dtype=np.float32)
+        R = Rz @ Ry @ Rx
+
+        f = float(focal_length_px)
+        K = np.array([[f, 0, cx], [0, f, cy], [0, 0, 1]], dtype=np.float32)
+        K_inv = np.linalg.inv(K)
+
+        # Backward projection homography
+        H_inv = K @ R.T @ K_inv
+
+        y_coords, x_coords = np.mgrid[0:h, 0:w].astype(np.float32)
+        ones = np.ones_like(x_coords)
+        dest_pts = np.stack([x_coords, y_coords, ones], axis=0).reshape(3, -1)
+
+        src_pts = H_inv @ dest_pts
+        src_x = (src_pts[0] / (src_pts[2] + 1e-8)).reshape(h, w)
+        src_y = (src_pts[1] / (src_pts[2] + 1e-8)).reshape(h, w)
+
+        x0 = np.clip(np.floor(src_x).astype(np.int32), 0, w - 2)
+        x1 = x0 + 1
+        y0 = np.clip(np.floor(src_y).astype(np.int32), 0, h - 2)
+        y1 = y0 + 1
+
+        wx1 = np.clip(src_x - x0, 0.0, 1.0)
+        wx0 = 1.0 - wx1
+        wy1 = np.clip(src_y - y0, 0.0, 1.0)
+        wy0 = 1.0 - wy1
+
+        valid_mask = (src_x >= 0) & (src_x <= w - 1) & (src_y >= 0) & (src_y <= h - 1)
+
+        if image.ndim == 3:
+            wx0 = wx0[:, :, np.newaxis]
+            wx1 = wx1[:, :, np.newaxis]
+            wy0 = wy0[:, :, np.newaxis]
+            wy1 = wy1[:, :, np.newaxis]
+            valid_mask = valid_mask[:, :, np.newaxis]
+
+            top_left = image[y0, x0, :]
+            top_right = image[y0, x1, :]
+            bottom_left = image[y1, x0, :]
+            bottom_right = image[y1, x1, :]
+
+            warped = (
+                wy0 * (wx0 * top_left + wx1 * top_right)
+                + wy1 * (wx0 * bottom_left + wx1 * bottom_right)
+            )
+            return np.where(valid_mask, warped, 0.0).astype(image.dtype)
+        else:
+            top_left = image[y0, x0]
+            top_right = image[y0, x1]
+            bottom_left = image[y1, x0]
+            bottom_right = image[y1, x1]
+
+            warped = (
+                wy0 * (wx0 * top_left + wx1 * top_right)
+                + wy1 * (wx0 * bottom_left + wx1 * bottom_right)
+            )
+            return np.where(valid_mask, warped, 0.0).astype(image.dtype)
+
     def generate_pair(
         self,
         identity_seed: int,
@@ -276,6 +359,9 @@ class ProceduralPalmGenerator:
         mehndi_coverage: float = 0.0,
         cupping_angle_deg: float = 0.0,
         callus_intensity: float = 0.0,
+        pitch_deg: float = 0.0,
+        roll_deg: float = 0.0,
+        yaw_deg: float = 0.0,
     ) -> Dict[str, np.ndarray]:
         """
         Generates a registered multi-spectral pair:
@@ -320,6 +406,11 @@ class ProceduralPalmGenerator:
             rgb_image = self.apply_3d_cupping_warp(rgb_image, cupping_angle_deg)
             nir_image = self.apply_3d_cupping_warp(nir_image, cupping_angle_deg)
 
+        # Apply true 3D perspective orientation foreshortening (pitch, roll, yaw)
+        if abs(pitch_deg) >= 0.5 or abs(roll_deg) >= 0.5 or abs(yaw_deg) >= 0.5:
+            rgb_image = self.apply_3d_pose_warp(rgb_image, pitch_deg, roll_deg, yaw_deg)
+            nir_image = self.apply_3d_pose_warp(nir_image, pitch_deg, roll_deg, yaw_deg)
+
         return {
             "rgb": np.clip(rgb_image, 0.0, 1.0),
             "nir": np.clip(nir_image, 0.0, 1.0),
@@ -327,6 +418,9 @@ class ProceduralPalmGenerator:
             "melanin_fraction": melanin_fraction,
             "mehndi_coverage": mehndi_coverage,
             "cupping_angle_deg": cupping_angle_deg,
+            "pitch_deg": pitch_deg,
+            "roll_deg": roll_deg,
+            "yaw_deg": yaw_deg,
         }
 
 
@@ -350,6 +444,9 @@ class CleanRoomPalmGenerator(ProceduralPalmGenerator):
         mehndi_coverage = float(rng.uniform(0.30, 0.60)) if has_mehndi else 0.0
         cupping_deg = float(rng.uniform(0.0, 20.0))
         callus = float(rng.uniform(0.0, 0.40)) if rng.uniform(0, 1) < 0.30 else 0.0
+        pitch = float(rng.uniform(-15.0, 15.0))
+        roll = float(rng.uniform(-15.0, 15.0))
+        yaw = float(rng.uniform(-10.0, 10.0))
 
         pair = self.generate_pair(
             identity_seed=self.base_seed + identity_index,
@@ -358,6 +455,9 @@ class CleanRoomPalmGenerator(ProceduralPalmGenerator):
             mehndi_coverage=mehndi_coverage,
             cupping_angle_deg=cupping_deg,
             callus_intensity=callus,
+            pitch_deg=pitch,
+            roll_deg=roll,
+            yaw_deg=yaw,
         )
 
         rgb = pair["rgb"]

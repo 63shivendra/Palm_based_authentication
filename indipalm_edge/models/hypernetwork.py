@@ -14,6 +14,7 @@ Licensed under the Apache License, Version 2.0.
 """
 
 from typing import Tuple, Dict, Any, Union, Optional
+import math
 import numpy as np
 import torch
 import torch.nn as nn
@@ -148,6 +149,15 @@ class DynamicPoseArcFaceLoss(nn.Module):
 
         theta = torch.acos(cos_theta)
         cos_theta_m = torch.cos(theta + m)
+
+        # Monotonicity guard: Deng et al. (CVPR 2019 ArcFace Section 3.2)
+        # Prevents gradient reversal when theta + m > pi on difficult or noisy presentations
+        sin_m = torch.sin(m)
+        cos_theta_m = torch.where(
+            theta > (math.pi - m),
+            cos_theta - m * sin_m,
+            cos_theta_m,
+        )
 
         one_hot = torch.zeros_like(cos_theta)
         one_hot.scatter_(1, labels.view(-1, 1), 1.0)

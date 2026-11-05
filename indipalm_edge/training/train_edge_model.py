@@ -99,7 +99,7 @@ class MultiSpectralIdentityDataset(Dataset):
         # 5. Occupational manual labor callus intensity
         callus = float(rng.uniform(0.0, 0.35)) if rng.uniform(0, 1) < 0.30 else 0.0
 
-        # Generate physically registered pair
+        # Generate physically registered pair with true 3D perspective foreshortening
         pair = self.generator.generate_pair(
             identity_seed=self.identity_offset * 10000 + local_id,
             presentation_seed=variant_seed,
@@ -107,6 +107,9 @@ class MultiSpectralIdentityDataset(Dataset):
             mehndi_coverage=mehndi_coverage,
             cupping_angle_deg=cupping_deg,
             callus_intensity=callus,
+            pitch_deg=pitch,
+            roll_deg=roll,
+            yaw_deg=yaw,
         )
 
         rgb_raw = pair["rgb"]
