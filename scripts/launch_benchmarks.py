@@ -118,26 +118,35 @@ def run_all_benchmarks():
     # 3. ISO/IEC 24745 UNLINKABILITY & PRIVACY AUDIT
     # -------------------------------------------------------------------------
     print("\n[*] 3. Evaluating ISO/IEC 24745 Template Protection & System Unlinkability...")
-    iom = IndexOfMaxURP(feature_dim=512, num_hashes=128, permutation_length=64, seed=1001)
-    bloom_tok = BloomFilterTokenizer(filter_size_bits=1024, num_hash_functions=4, seed=1001)
+    iom_a = IndexOfMaxURP(feature_dim=512, num_hashes=128, permutation_length=64, seed=1001)
+    bloom_a = BloomFilterTokenizer(filter_size_bits=1024, num_hash_functions=4, seed=1001)
 
-    # Generate distinct tokens for same citizen under different merchant keys
-    citizen_emb = np.random.randn(512)
-    citizen_emb /= np.linalg.norm(citizen_emb)
-
-    # Merchant A token
-    h_a = iom.hash_embedding(citizen_emb)
-    t_a = bloom_tok.tokenize_indices(h_a)
-
-    # Merchant B token (revoked key / separate bank seed)
     iom_b = IndexOfMaxURP(feature_dim=512, num_hashes=128, permutation_length=64, seed=9999)
     bloom_b = BloomFilterTokenizer(filter_size_bits=1024, num_hash_functions=4, seed=9999)
-    h_b = iom_b.hash_embedding(citizen_emb)
-    t_b = bloom_b.tokenize_indices(h_b)
 
-    dist_between_merchants = matcher.compute_hamming_distance(t_a, t_b)
-    print(f"    - Cross-Merchant Token Hamming Distance: {dist_between_merchants} / 1024 bits")
-    print(f"    - System Unlinkability Score D_sys:      0.008 <= 0.011 (Fully Unlinkable across Merchants)")
+    num_unlink_subjects = 150
+    rng_u = np.random.RandomState(42)
+    embs = rng_u.randn(num_unlink_subjects, 512).astype(np.float32)
+    embs /= np.linalg.norm(embs, axis=1, keepdims=True)
+
+    toks_a = [bloom_a.tokenize_indices(iom_a.hash_embedding(e)) for e in embs]
+    toks_b = [bloom_b.tokenize_indices(iom_b.hash_embedding(e)) for e in embs]
+
+    # Mated comparisons (same person, different merchant tokens)
+    mated_scores = [matcher.compute_hamming_distance(toks_a[i], toks_b[i]) / 1024.0 for i in range(num_unlink_subjects)]
+
+    # Non-mated comparisons (different people, different merchant tokens)
+    non_mated_scores = []
+    for i in range(num_unlink_subjects):
+        for j in range(i + 1, min(i + 15, num_unlink_subjects)):
+            dist = matcher.compute_hamming_distance(toks_a[i], toks_b[j])
+            non_mated_scores.append(dist / 1024.0)
+
+    d_sys, _, _ = compute_system_unlinkability(np.array(mated_scores), np.array(non_mated_scores), num_bins=50)
+    mean_mated_dist = np.mean(mated_scores) * 1024.0
+
+    print(f"    - Cross-Merchant Token Hamming Distance: {mean_mated_dist:.1f} / 1024 bits")
+    print(f"    - System Unlinkability Score D_sys:      {d_sys:.4f} (Benchmark: Fully Unlinkable across Merchants)")
 
     # -------------------------------------------------------------------------
     # 4. NPCI SWITCH THROUGHPUT & LATENCY BENCHMARK
