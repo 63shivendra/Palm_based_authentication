@@ -196,3 +196,4 @@ class SovereignEdgeInferenceEngine(nn.Module):
             "total_latency_ms": round(total_elapsed_ms, 2),
             "within_edge_budget": total_elapsed_ms <= EDGE_MAX_TOTAL_LATENCY_MS,
         }
+

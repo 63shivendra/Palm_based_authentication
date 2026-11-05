@@ -74,3 +74,4 @@ class PhysicsConditioningEncoder(nn.Module):
         global_cond = self.global_mlp(global_in)  # (B, C)
 
         return spatial_cond, global_cond
+

@@ -60,3 +60,4 @@ def test_dual_stream_unet_forward():
     assert eps_nir.shape == (b, 1, h, w)
     assert not torch.isnan(eps_rgb).any()
     assert not torch.isnan(eps_nir).any()
+

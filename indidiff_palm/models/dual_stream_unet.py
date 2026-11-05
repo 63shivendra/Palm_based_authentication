@@ -220,3 +220,4 @@ class DualStreamDiffusionUNet(nn.Module):
         eps_nir = self.out_head_nir(h_nir)
 
         return eps_rgb, eps_nir
+

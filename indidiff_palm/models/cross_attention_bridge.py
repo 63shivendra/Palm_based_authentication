@@ -103,3 +103,4 @@ class CrossSpectralBidirectionalAttentionBridge(nn.Module):
         f_nir_out = f_nir + self.gamma_nir * attn_nir
 
         return f_rgb_out, f_nir_out
+

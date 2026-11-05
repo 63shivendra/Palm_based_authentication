@@ -77,3 +77,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     generate_cohort(count=args.count, output_dir=args.output_dir, seed=args.seed)
+

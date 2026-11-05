@@ -61,3 +61,4 @@ def test_full_edge_pipeline_spoof_rejection():
     assert result["status"] == "REJECTED_SPOOF_ATTACK"
     assert result["authorized"] is False
     assert result["token"] is None
+
