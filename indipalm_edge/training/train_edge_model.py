@@ -62,17 +62,23 @@ class MultiSpectralIdentityDataset(Dataset):
         samples_per_id: int = 10,
         identity_offset: int = 0,
         seed: int = 1337,
+        cache_data: bool = True,
     ):
         self.num_identities = num_identities
         self.samples_per_id = samples_per_id
         self.identity_offset = identity_offset
         self.total_samples = num_identities * samples_per_id
         self.generator = CleanRoomPalmGenerator(base_seed=seed)
+        self.cache_data = cache_data
+        self._cache = {}
 
     def __len__(self) -> int:
         return self.total_samples
 
     def __getitem__(self, idx: int):
+        if self.cache_data and idx in self._cache:
+            return self._cache[idx]
+
         local_id = idx // self.samples_per_id
         global_identity_id = self.identity_offset + local_id
         sample_variant = idx % self.samples_per_id
@@ -130,12 +136,15 @@ class MultiSpectralIdentityDataset(Dataset):
             [np.radians(pitch), np.radians(roll), np.radians(yaw)], dtype=torch.float32
         )
 
-        return {
+        item = {
             "rgb": rgb_t,
             "nir": nir_t,
             "pose": pose_rad,
             "label": local_id,
         }
+        if self.cache_data:
+            self._cache[idx] = item
+        return item
 
 
 class EdgeBiometricModel(nn.Module):
@@ -270,34 +279,43 @@ def train_edge_model(
     device_obj = torch.device(device if torch.cuda.is_available() and device == "cuda" else "cpu")
     if device_obj.type == "cuda":
         torch.backends.cudnn.benchmark = True
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
         gpu_name = torch.cuda.get_device_name(0)
         vram_gb = torch.cuda.get_device_properties(0).total_memory / (1024**3)
-        print(f"[*] GPU Acceleration Active: {gpu_name} ({vram_gb:.1f} GB VRAM)")
+        capability = torch.cuda.get_device_capability(0)
+        arch_label = "Blackwell Architecture (Compute 12.x)" if capability[0] >= 12 else "Ada / Ampere Architecture"
+        print(f"[*] GPU Acceleration Active: {gpu_name} ({vram_gb:.1f} GB VRAM, {arch_label})")
+        print(f"[*] Native Blackwell Tensor Cores: TF32 + BFloat16 Mixed Precision Enabled")
     else:
         print(f"[*] Executing on device: {device_obj}")
 
     device = device_obj
+    use_bf16 = (device.type == "cuda" and torch.cuda.is_bf16_supported())
     print(f"[*] Initializing IndiPalm-Edge Recognition Training on device: {device}")
     print(f"    - Training Identities:   {num_classes:,} ({num_classes * samples_per_id:,} presentations)")
     print(f"    - Open-Set Val Identities: {val_classes:,} ({val_classes * samples_per_id:,} presentations - UNSEEN)")
     print(f"    - Total Multi-Spectral Presentations: {(num_classes + val_classes) * samples_per_id:,} pairs")
 
-    # 1. Training & Validation Datasets (Strictly Disjoint Identity Sets)
+    # 1. Training & Validation Datasets (Strictly Disjoint Identity Sets + In-Memory Fast Caching)
     train_dataset = MultiSpectralIdentityDataset(
         num_identities=num_classes,
         samples_per_id=samples_per_id,
         identity_offset=0,
         seed=42,
+        cache_data=True,
     )
     val_dataset = MultiSpectralIdentityDataset(
         num_identities=val_classes,
         samples_per_id=samples_per_id,
         identity_offset=100000,  # Far away identity offset guarantees ZERO identity overlap!
         seed=999,
+        cache_data=True,
     )
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    pin_mem = (device.type == "cuda")
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True, pin_memory=pin_mem)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, pin_memory=pin_mem)
 
     # 2. Complete Model & Dynamic Pose-Conditioned Margin Loss
     model = EdgeBiometricModel(num_classes=num_classes, embedding_dim=EMBEDDING_DIM).to(device)
@@ -334,17 +352,18 @@ def train_edge_model(
             pose = batch["pose"].to(device)
             labels = batch["label"].to(device)
 
-            # Forward pass
-            emb, flow_field, dynamic_mask = model(rgb, nir, pose)
+            # Forward pass accelerated with Blackwell BFloat16 Tensor Cores
+            with torch.amp.autocast("cuda", dtype=torch.bfloat16, enabled=use_bf16):
+                emb, flow_field, dynamic_mask = model(rgb, nir, pose)
 
-            # 1. Continuous Pose-Conditioned DP-SubArc Metric Loss
-            l_metric, logits = metric_criterion(emb, labels, pose)
+                # 1. Continuous Pose-Conditioned DP-SubArc Metric Loss
+                l_metric, logits = metric_criterion(emb, labels, pose)
 
-            # 2. Biomechanical Jacobian Non-Folding Regularization
-            l_biomech = model.kinematic_flow.compute_biomechanical_loss(flow_field)
+                # 2. Biomechanical Jacobian Non-Folding Regularization
+                l_biomech = model.kinematic_flow.compute_biomechanical_loss(flow_field)
 
-            # Composite total loss
-            loss = l_metric + 0.05 * l_biomech
+                # Composite total loss
+                loss = l_metric + 0.05 * l_biomech
 
             optimizer.zero_grad()
             loss.backward()
