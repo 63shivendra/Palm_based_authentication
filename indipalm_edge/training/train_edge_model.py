@@ -87,20 +87,22 @@ class MultiSpectralIdentityDataset(Dataset):
         variant_seed = self.identity_offset * 1000 + local_id * 31 + sample_variant * 7
         rng = np.random.RandomState(variant_seed)
 
+        # Melanin base: constitutive identity attribute (seeded by identity, minor presentation exposure jitter)
+        rng_id = np.random.RandomState(self.identity_offset * 10000 + local_id)
+        base_melanin = float(rng_id.uniform(0.20, 0.45))
+        melanin = float(np.clip(base_melanin + rng.uniform(-0.02, 0.02), 0.15, 0.50))
+
         # 1. Stochastic 3D pose variations (pitch, roll, yaw in degrees)
-        pitch = float(rng.uniform(-25.0, 25.0))
-        roll = float(rng.uniform(-25.0, 25.0))
-        yaw = float(rng.uniform(-18.0, 18.0))
+        pitch = float(rng.uniform(-15.0, 15.0))
+        roll = float(rng.uniform(-15.0, 15.0))
+        yaw = float(rng.uniform(-10.0, 10.0))
 
         # 2. Stochastic Mehndi dye coverage
         has_mehndi = bool(rng.uniform(0, 1) < 0.35)
         mehndi_coverage = float(rng.uniform(0.25, 0.65)) if has_mehndi else 0.0
 
         # 3. Stochastic 3D cupping curvature
-        cupping_deg = float(rng.uniform(0.0, 30.0))
-
-        # 4. Stochastic melanin fraction (Fitzpatrick IV-VI)
-        melanin = float(rng.uniform(0.20, 0.45))
+        cupping_deg = float(rng.uniform(0.0, 20.0))
 
         # 5. Occupational manual labor callus intensity
         callus = float(rng.uniform(0.0, 0.35)) if rng.uniform(0, 1) < 0.30 else 0.0
@@ -356,8 +358,9 @@ def train_edge_model(
             with torch.amp.autocast("cuda", dtype=torch.bfloat16, enabled=use_bf16):
                 emb, flow_field, dynamic_mask = model(rgb, nir, pose)
 
-                # 1. Continuous Pose-Conditioned DP-SubArc Metric Loss
-                l_metric, logits = metric_criterion(emb, labels, pose)
+                # 1. Continuous Pose-Conditioned DP-SubArc Metric Loss (with linear margin warmup)
+                margin_scale = min(1.0, (epoch - 1) / 3.0)
+                l_metric, logits, cosines = metric_criterion(emb, labels, pose, margin_scale=margin_scale)
 
                 # 2. Biomechanical Jacobian Non-Folding Regularization
                 l_biomech = model.kinematic_flow.compute_biomechanical_loss(flow_field)
@@ -372,7 +375,7 @@ def train_edge_model(
             lr_scheduler.step()
 
             total_epoch_loss += loss.item()
-            preds = torch.argmax(logits, dim=1)
+            preds = torch.argmax(cosines, dim=1)
             correct_predictions += (preds == labels).sum().item()
             total_predictions += labels.shape[0]
 

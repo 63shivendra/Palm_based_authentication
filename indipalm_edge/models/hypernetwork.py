@@ -136,16 +136,14 @@ class DynamicPoseArcFaceLoss(nn.Module):
         nn.init.xavier_uniform_(self.weight)
         self.hyper = PoseConditionedHypernetwork(embedding_dim=embedding_dim)
 
-    def forward(
-        self, embeddings: torch.Tensor, labels: torch.Tensor, poses: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, embeddings: torch.Tensor, labels: torch.Tensor, poses: torch.Tensor, margin_scale: float = 1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         # Normalize weights
         w_norm = F.normalize(self.weight, p=2, dim=1)
         cos_theta = F.linear(embeddings, w_norm)
         cos_theta = torch.clamp(cos_theta, -1.0 + 1e-7, 1.0 - 1e-7)
 
-        # Dynamic margin per sample
-        m = self.hyper.compute_dynamic_margin(poses)  # (B, 1)
+        # Dynamic margin per sample with linear warmup
+        m = self.hyper.compute_dynamic_margin(poses) * margin_scale  # (B, 1)
 
         theta = torch.acos(cos_theta)
         cos_theta_m = torch.cos(theta + m)
@@ -164,4 +162,4 @@ class DynamicPoseArcFaceLoss(nn.Module):
 
         logits = (one_hot * cos_theta_m + (1.0 - one_hot) * cos_theta) * self.scale
         loss = F.cross_entropy(logits, labels)
-        return loss, logits
+        return loss, logits, cos_theta

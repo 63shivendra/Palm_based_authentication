@@ -83,40 +83,39 @@ class ProceduralPalmGenerator:
         """
         crease_mask = np.zeros((self.height, self.width), dtype=np.float32)
 
-        # 1. Radial Transverse Crease (Life Line)
-        p0 = (self.width * (0.20 + rng.uniform(-0.02, 0.02)), self.height * (0.15 + rng.uniform(-0.02, 0.02)))
-        p1 = (self.width * 0.28, self.height * 0.40)
-        p2 = (self.width * 0.35, self.height * 0.65)
-        p3 = (self.width * 0.42, self.height * 0.85)
-        p4 = (self.width * 0.50, self.height * 0.95)
+        # 1. Radial Transverse Crease (Life Line) - Unique anatomical trajectory per identity
+        p0 = (self.width * rng.uniform(0.15, 0.25), self.height * rng.uniform(0.12, 0.22))
+        p1 = (self.width * rng.uniform(0.24, 0.36), self.height * rng.uniform(0.35, 0.48))
+        p2 = (self.width * rng.uniform(0.30, 0.45), self.height * rng.uniform(0.58, 0.72))
+        p3 = (self.width * rng.uniform(0.38, 0.52), self.height * rng.uniform(0.78, 0.90))
+        p4 = (self.width * rng.uniform(0.44, 0.60), self.height * rng.uniform(0.88, 0.98))
         pts_life = self._bezier_4th_order(p0, p1, p2, p3, p4, num_points=120)
-        self._rasterize_polyline(crease_mask, pts_life, intensity=0.90)
+        self._rasterize_polyline(crease_mask, pts_life, intensity=rng.uniform(0.85, 1.0))
 
         if is_simian:
-            # Single transverse palmar crease (Simian Line variant in ~1.5% humans)
-            p0 = (self.width * 0.15, self.height * 0.45)
-            p1 = (self.width * 0.35, self.height * 0.44)
-            p2 = (self.width * 0.55, self.height * 0.46)
-            p3 = (self.width * 0.75, self.height * 0.45)
-            p4 = (self.width * 0.90, self.height * 0.48)
+            p0 = (self.width * rng.uniform(0.10, 0.18), self.height * rng.uniform(0.40, 0.50))
+            p1 = (self.width * rng.uniform(0.30, 0.40), self.height * rng.uniform(0.38, 0.48))
+            p2 = (self.width * rng.uniform(0.50, 0.60), self.height * rng.uniform(0.40, 0.50))
+            p3 = (self.width * rng.uniform(0.70, 0.80), self.height * rng.uniform(0.42, 0.52))
+            p4 = (self.width * rng.uniform(0.85, 0.95), self.height * rng.uniform(0.44, 0.54))
             pts_simian = self._bezier_4th_order(p0, p1, p2, p3, p4, num_points=120)
             self._rasterize_polyline(crease_mask, pts_simian, intensity=1.0)
         else:
-            # Proximal Transverse Crease (Head Line)
-            p0 = (self.width * 0.20, self.height * 0.20)
-            p1 = (self.width * 0.38, self.height * 0.45)
-            p2 = (self.width * 0.55, self.height * 0.55)
-            p3 = (self.width * 0.72, self.height * 0.60)
-            p4 = (self.width * 0.88, self.height * 0.65)
+            # Proximal Transverse Crease (Head Line) - Distinct origin and slant per identity
+            p0 = (self.width * rng.uniform(0.15, 0.25), self.height * rng.uniform(0.16, 0.26))
+            p1 = (self.width * rng.uniform(0.32, 0.44), self.height * rng.uniform(0.38, 0.50))
+            p2 = (self.width * rng.uniform(0.48, 0.62), self.height * rng.uniform(0.48, 0.62))
+            p3 = (self.width * rng.uniform(0.65, 0.78), self.height * rng.uniform(0.54, 0.68))
+            p4 = (self.width * rng.uniform(0.80, 0.94), self.height * rng.uniform(0.58, 0.74))
             pts_head = self._bezier_4th_order(p0, p1, p2, p3, p4, num_points=120)
-            self._rasterize_polyline(crease_mask, pts_head, intensity=0.85)
+            self._rasterize_polyline(crease_mask, pts_head, intensity=rng.uniform(0.80, 0.95))
 
-            # Distal Transverse Crease (Heart Line)
-            p0 = (self.width * 0.88, self.height * 0.30)
-            p1 = (self.width * 0.70, self.height * 0.32)
-            p2 = (self.width * 0.50, self.height * 0.35)
-            p3 = (self.width * 0.35, self.height * 0.30)
-            p4 = (self.width * 0.25, self.height * 0.20)
+            # Distal Transverse Crease (Heart Line) - Variable curvature towards index/middle finger
+            p0 = (self.width * rng.uniform(0.82, 0.94), self.height * rng.uniform(0.24, 0.36))
+            p1 = (self.width * rng.uniform(0.64, 0.76), self.height * rng.uniform(0.26, 0.38))
+            p2 = (self.width * rng.uniform(0.44, 0.56), self.height * rng.uniform(0.28, 0.42))
+            p3 = (self.width * rng.uniform(0.30, 0.42), self.height * rng.uniform(0.24, 0.36))
+            p4 = (self.width * rng.uniform(0.18, 0.30), self.height * rng.uniform(0.15, 0.28))
             pts_heart = self._bezier_4th_order(p0, p1, p2, p3, p4, num_points=120)
             self._rasterize_polyline(crease_mask, pts_heart, intensity=0.88)
 
@@ -162,16 +161,14 @@ class ProceduralPalmGenerator:
         """
         vein_mask = np.zeros((self.height, self.width), dtype=np.float32)
 
-        # Superficial Palmar Arch
-        arch_pts = self._bezier_4th_order(
-            (self.width * 0.25, self.height * 0.55),
-            (self.width * 0.40, self.height * 0.48),
-            (self.width * 0.60, self.height * 0.50),
-            (self.width * 0.75, self.height * 0.58),
-            (self.width * 0.85, self.height * 0.68),
-            num_points=60,
-        )
-        self._rasterize_polyline(vein_mask, arch_pts, intensity=0.6)
+        # Superficial Palmar Arch (Unique trajectory per identity)
+        p0 = (self.width * rng.uniform(0.20, 0.30), self.height * rng.uniform(0.50, 0.60))
+        p1 = (self.width * rng.uniform(0.35, 0.45), self.height * rng.uniform(0.44, 0.52))
+        p2 = (self.width * rng.uniform(0.55, 0.65), self.height * rng.uniform(0.46, 0.54))
+        p3 = (self.width * rng.uniform(0.70, 0.80), self.height * rng.uniform(0.54, 0.62))
+        p4 = (self.width * rng.uniform(0.80, 0.90), self.height * rng.uniform(0.64, 0.72))
+        arch_pts = self._bezier_4th_order(p0, p1, p2, p3, p4, num_points=60)
+        self._rasterize_polyline(vein_mask, arch_pts, intensity=rng.uniform(0.50, 0.70))
 
         # Root venous trunk at palmar base (wrist center)
         nodes = [(self.width * 0.5, self.height * 0.95, -np.pi / 2.0, 2.4, 0)]
@@ -263,8 +260,8 @@ class ProceduralPalmGenerator:
         focal_length_px: float = 300.0,
     ) -> np.ndarray:
         """
-        Applies rigorous 3D projective perspective foreshortening around the center of the palm.
-        Simulates compound presentation angles (pitch, roll, yaw in [-25°, +25°]).
+        Applies rigorous 3D projective perspective foreshortening centered around the palm center (cx, cy).
+        Simulates compound presentation angles (pitch, roll, yaw) with median-skin border padding.
         """
         if abs(pitch_deg) < 0.5 and abs(roll_deg) < 0.5 and abs(yaw_deg) < 0.5:
             return image
@@ -279,23 +276,20 @@ class ProceduralPalmGenerator:
         Rx = np.array([[1, 0, 0], [0, np.cos(rx), -np.sin(rx)], [0, np.sin(rx), np.cos(rx)]], dtype=np.float32)
         Ry = np.array([[np.cos(ry), 0, np.sin(ry)], [0, 1, 0], [-np.sin(ry), 0, np.cos(ry)]], dtype=np.float32)
         Rz = np.array([[np.cos(rz), -np.sin(rz), 0], [np.sin(rz), np.cos(rz), 0], [0, 0, 1]], dtype=np.float32)
-        R = Rz @ Ry @ Rx
-
-        f = float(focal_length_px)
-        K = np.array([[f, 0, cx], [0, f, cy], [0, 0, 1]], dtype=np.float32)
-        K_inv = np.linalg.inv(K)
-
-        # Backward projection homography
-        H_inv = K @ R.T @ K_inv
+        R_inv = (Rz @ Ry @ Rx).T
 
         y_coords, x_coords = np.mgrid[0:h, 0:w].astype(np.float32)
-        ones = np.ones_like(x_coords)
-        dest_pts = np.stack([x_coords, y_coords, ones], axis=0).reshape(3, -1)
+        X = x_coords - cx
+        Y = y_coords - cy
+        pts_dest = np.stack([X.flatten(), Y.flatten(), np.zeros(h * w, dtype=np.float32)], axis=0)
+        pts_src = R_inv @ pts_dest
 
-        src_pts = H_inv @ dest_pts
-        src_x = (src_pts[0] / (src_pts[2] + 1e-8)).reshape(h, w)
-        src_y = (src_pts[1] / (src_pts[2] + 1e-8)).reshape(h, w)
+        Z_src = pts_src[2]
+        d = float(focal_length_px)
+        src_x = (pts_src[0] / (1.0 + Z_src / d) + cx).reshape(h, w)
+        src_y = (pts_src[1] / (1.0 + Z_src / d) + cy).reshape(h, w)
 
+        valid_mask = (src_x >= 0) & (src_x <= w - 1) & (src_y >= 0) & (src_y <= h - 1)
         x0 = np.clip(np.floor(src_x).astype(np.int32), 0, w - 2)
         x1 = x0 + 1
         y0 = np.clip(np.floor(src_y).astype(np.int32), 0, h - 2)
@@ -305,8 +299,6 @@ class ProceduralPalmGenerator:
         wx0 = 1.0 - wx1
         wy1 = np.clip(src_y - y0, 0.0, 1.0)
         wy0 = 1.0 - wy1
-
-        valid_mask = (src_x >= 0) & (src_x <= w - 1) & (src_y >= 0) & (src_y <= h - 1)
 
         if image.ndim == 3:
             wx0 = wx0[:, :, np.newaxis]
@@ -324,7 +316,8 @@ class ProceduralPalmGenerator:
                 wy0 * (wx0 * top_left + wx1 * top_right)
                 + wy1 * (wx0 * bottom_left + wx1 * bottom_right)
             )
-            return np.where(valid_mask, warped, 0.0).astype(image.dtype)
+            fill_val = np.median(image, axis=(0, 1), keepdims=True)
+            return np.where(valid_mask, warped, fill_val).astype(image.dtype)
         else:
             top_left = image[y0, x0]
             top_right = image[y0, x1]
@@ -335,7 +328,8 @@ class ProceduralPalmGenerator:
                 wy0 * (wx0 * top_left + wx1 * top_right)
                 + wy1 * (wx0 * bottom_left + wx1 * bottom_right)
             )
-            return np.where(valid_mask, warped, 0.0).astype(image.dtype)
+            fill_val = float(np.median(image))
+            return np.where(valid_mask, warped, fill_val).astype(image.dtype)
 
     def generate_pair(
         self,

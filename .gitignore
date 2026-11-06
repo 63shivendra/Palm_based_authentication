@@ -31,12 +31,15 @@ ENV/
 .coverage
 htmlcov/
 
-# IDE & OS
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
+# Datasets & Checkpoints
+data/
+checkpoints/
+*.pt
+*.pth
+*.zip
+*.tar
+*.gz
+*.rar
+*.bin
+
 
