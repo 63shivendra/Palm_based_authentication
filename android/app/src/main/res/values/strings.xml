@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">PalmPay Matcher</string>
+    <string name="btn_enroll">Enroll Palm</string>
+    <string name="btn_verify">Verify Palm</string>
+    <string name="status_ready">Align your palm inside the guide</string>
+    <string name="status_enrolled">Enrolled! Now switch to Verify mode</string>
+    <string name="status_matched">MATCH DETECTED (Verified)</string>
+    <string name="status_not_matched">NO MATCH (Different Palm)</string>
+    <string name="camera_permission_request">Camera permission is required for palm recognition.</string>
+</resources>
+
