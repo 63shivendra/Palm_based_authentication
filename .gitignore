@@ -43,3 +43,6 @@ checkpoints/
 *.bin
 
 
+
+# web app: enrolled templates and history stay on this computer
+webapp/data/

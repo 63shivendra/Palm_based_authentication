@@ -49,6 +49,25 @@
 
 ---
 
+## Training-free palm matcher and live test web app
+
+The matcher that needs no palm training data is in three files: `palm_match.py` (v3), `palm_match_compact.py`
+(v3c, compact template) and `palm_match_robust.py` (v3cr, v3c plus noise smoothing and retry). Benchmark results,
+CSV files and charts are in [`benchmarks/results/`](benchmarks/results/REPORT.md).
+
+To try all three side by side with a webcam or uploaded photos:
+
+```
+pip install flask torch kornia mediapipe opencv-python
+python webapp/app.py          # then open http://127.0.0.1:5050
+```
+
+Enrol a person with 1-3 palm photos, then verify new photos. The dashboard shows each version's decision,
+score and timing. Templates are stored only in `webapp/data/` on the local machine (not in git); photos are
+not saved. There is no spoof detection yet.
+
+---
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0. See [`LICENSE`](LICENSE) for details.

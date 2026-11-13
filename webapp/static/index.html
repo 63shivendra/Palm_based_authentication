@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palm verification: live test</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --page: #f4f4f1; --surface: #fcfcfb; --raised: #ffffff; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+  --line: #e1e0d9; --track: #ecebe6; --accent: #1f5fb0; --accent-ink: #ffffff;
+  --good: #0ca30c; --good-ink: #006300; --good-wash: #e6f5e6; --bad: #d03b3b; --bad-ink: #a32222; --bad-wash: #fbe9e9;
+  --warn-wash: #fff4d6; --warn-ink: #6b4a00;
+  --v3: #2a78d6; --v3c: #eb6834; --v3cr: #1baf7a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #0d0d0d; --surface: #1a1a19; --raised: #222221; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+    --line: #2c2c2a; --track: #2c2c2a; --accent: #3987e5; --accent-ink: #0b0b0b;
+    --good: #0ca30c; --good-ink: #5ed05e; --good-wash: #12301a; --bad: #e66767; --bad-ink: #f09a9a; --bad-wash: #3a1818;
+    --warn-wash: #3a2f10; --warn-ink: #f2d27a;
+    --v3: #3987e5; --v3c: #d95926; --v3cr: #199e70;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+h1 { font-size: 20px; margin: 0; font-weight: 650; }
+h2 { font-size: 15px; margin: 0 0 12px; font-weight: 650; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 20px 16px 48px; }
+header { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+header .sub { color: var(--ink2); font-size: 13.5px; }
+.notice { background: var(--warn-wash); color: var(--warn-ink); border-radius: 8px; padding: 8px 12px; font-size: 13.5px; margin-bottom: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.tile .label { color: var(--ink2); font-size: 13px; }
+.tile .value { font-size: 28px; font-weight: 650; line-height: 1.2; margin-top: 2px; }
+.tile .note { color: var(--muted); font-size: 12.5px; }
+.rows { margin-top: 6px; display: grid; gap: 3px; font-size: 13.5px; }
+.rows div { display: flex; justify-content: space-between; gap: 8px; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; }
+.dot.v3 { background: var(--v3); } .dot.v3c { background: var(--v3c); } .dot.v3cr { background: var(--v3cr); }
+.main { display: grid; grid-template-columns: minmax(300px, 400px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--track); border-radius: 9px; padding: 3px; margin-bottom: 12px; }
+.seg button { border: 0; background: transparent; color: var(--ink2); padding: 7px; border-radius: 7px; font: inherit; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--raised); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+label { display: block; font-size: 13px; color: var(--ink2); margin-bottom: 4px; }
+input[type=text], select { width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--raised); color: var(--ink); font: inherit; }
+.hint { color: var(--muted); font-size: 12.5px; margin: 5px 0 12px; min-height: 18px; }
+.stage { position: relative; background: #111; border-radius: 10px; aspect-ratio: 4 / 3; overflow: hidden; display: grid; place-items: center; color: #bbb; font-size: 13.5px; text-align: center; padding: 12px; }
+.stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: none; }
+.stage.live video { display: block; }
+.btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+button.b { border: 1px solid var(--line); background: var(--raised); color: var(--ink); padding: 9px 10px; border-radius: 8px; font: inherit; cursor: pointer; }
+button.b.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+button.b:disabled { opacity: .5; cursor: not-allowed; }
+button.link { border: 0; background: none; color: var(--accent); font: inherit; font-size: 13px; cursor: pointer; padding: 0; }
+.samples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+.samples button { border: 1px solid var(--line); background: var(--raised); border-radius: 8px; padding: 4px; cursor: pointer; color: var(--ink2); font-size: 11.5px; line-height: 1.25; }
+.samples img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 5px; display: block; margin-bottom: 3px; }
+.msg { margin-top: 12px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; display: none; }
+.msg.show { display: block; }
+.msg.ok { background: var(--good-wash); color: var(--good-ink); } .msg.err { background: var(--bad-wash); color: var(--bad-ink); }
+.msg.info { background: var(--track); color: var(--ink2); }
+.empty { color: var(--muted); padding: 28px 8px; text-align: center; }
+.resulthead { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; }
+.resulthead img { width: 132px; height: 132px; border-radius: 8px; border: 1px solid var(--line); }
+.resulthead .t { font-size: 17px; font-weight: 650; margin-bottom: 6px; }
+.facts { display: grid; grid-template-columns: auto auto; gap: 2px 18px; font-size: 13.5px; color: var(--ink2); width: fit-content; }
+.facts b { color: var(--ink); font-weight: 600; }
+.models { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.model { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.model .name { font-weight: 650; } .model .detail { color: var(--muted); font-size: 12.5px; margin-bottom: 10px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-weight: 650; font-size: 13.5px; }
+.pill.yes { background: var(--good-wash); color: var(--good-ink); } .pill.no { background: var(--bad-wash); color: var(--bad-ink); }
+.score { font-size: 30px; font-weight: 650; line-height: 1.15; margin-top: 10px; }
+.score small { font-size: 13px; font-weight: 400; color: var(--ink2); }
+.meter { position: relative; height: 8px; border-radius: 4px; background: var(--track); margin: 8px 0 4px; }
+.meter i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
+.meter .tick { position: absolute; left: 25%; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
+.meterlabel { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; font-size: 13px; color: var(--ink2); }
+.kv b { color: var(--ink); font-weight: 600; text-align: right; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { text-align: left; color: var(--ink2); font-weight: 600; padding: 7px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.claimed td { font-weight: 600; }
+.tablewrap { overflow-x: auto; }
+#history table { min-width: 640px; }
+.since { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+.yes-t { color: var(--good-ink); } .no-t { color: var(--bad-ink); }
+.section { margin-top: 16px; }
+.sectionhead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.below { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 16px; margin-top: 16px; align-items: start; }
+@media (max-width: 920px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .main, .below, .models { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Palm verification: live test</h1>
+    <div class="sub" id="device">Loading…</div>
+  </header>
+  <div class="notice">No spoof detection yet: a photo of a palm can be accepted. Photos are not saved; only templates are stored on this computer.</div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="main">
+    <section class="card" aria-label="Take a photo">
+      <div class="seg" role="group" aria-label="Mode">
+        <button id="modeEnrol" aria-pressed="true">1. Enrol</button>
+        <button id="modeVerify" aria-pressed="false">2. Verify</button>
+      </div>
+      <div id="enrolFields">
+        <label for="name">Person's name</label>
+        <input type="text" id="name" maxlength="40" placeholder="e.g. Asha" autocomplete="off">
+        <div class="hint" id="enrolHint"></div>
+      </div>
+      <div id="verifyFields" hidden>
+        <label for="person">Verify against</label>
+        <select id="person"></select>
+        <div class="hint">The new photo is compared with this person's enrolled photos.</div>
+      </div>
+      <div class="stage" id="stage">
+        <span id="stageText">Start the camera, upload a photo, or use a sample photo.<br>Show the open palm, fingers spread, filling most of the picture.</span>
+        <video id="video" autoplay playsinline muted></video>
+      </div>
+      <div class="btns">
+        <button class="b" id="camBtn">Start camera</button>
+        <button class="b primary" id="shotBtn" disabled>Take photo</button>
+        <button class="b" id="upBtn" style="grid-column: 1 / -1">Upload photo</button>
+      </div>
+      <input type="file" id="file" accept="image/*" hidden>
+      <div id="sampleBox" hidden>
+        <label style="margin-top:14px">Sample photos (one person)</label>
+        <div class="samples" id="samples"></div>
+      </div>
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="card" aria-label="Result">
+      <h2>Result</h2>
+      <div id="result"><div class="empty">Enrol a person, then verify a photo. The decision of all three versions appears here.</div></div>
+    </section>
+  </div>
+
+  <div class="below">
+    <section class="card">
+      <h2>Enrolled people</h2>
+      <div class="tablewrap" id="people"></div>
+    </section>
+    <section class="card">
+      <div class="sectionhead"><h2>History</h2><button class="link" id="clearBtn">Clear history</button></div>
+      <div class="tablewrap" id="history"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const fmt = n => Number(n).toLocaleString('en-US', {maximumFractionDigits: 1});
+const kb = b => fmt(Math.round(b / 1000)) + ' KB';
+let S = null, mode = 'enrol', stream = null, busy = false;
+
+function say(kind, text) { const m = $('#msg'); m.className = 'msg show ' + kind; m.textContent = text; }
+function setBusy(b) {
+  busy = b;
+  $('#shotBtn').disabled = b || !stream; $('#upBtn').disabled = b; $('#camBtn').disabled = b;
+  document.querySelectorAll('#samples button').forEach(x => x.disabled = b);
+  if (b) say('info', 'Working…');
+}
+function setMode(m) {
+  mode = m;
+  $('#modeEnrol').setAttribute('aria-pressed', m === 'enrol'); $('#modeVerify').setAttribute('aria-pressed', m === 'verify');
+  $('#enrolFields').hidden = m !== 'enrol'; $('#verifyFields').hidden = m !== 'verify';
+  $('#shotBtn').textContent = m === 'enrol' ? 'Take photo and enrol' : 'Take photo and verify';
+  $('#upBtn').textContent = m === 'enrol' ? 'Upload photo and enrol' : 'Upload photo and verify';
+}
+
+function median(a) { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+
+function renderTiles() {
+  const v = S.history.filter(h => h.action === 'verify' && h.results), rej = S.history.filter(h => h.rejected).length;
+  const rows = f => S.models.map(m => `<div><span><span class="dot ${m.key}"></span>${m.name}</span><span>${f(m)}</span></div>`).join('');
+  $('#tiles').innerHTML = `
+    <div class="card tile"><div class="label">People enrolled</div><div class="value">${S.users.length}</div>
+      <div class="note">${S.users.reduce((a, u) => a + u.photos, 0)} photos in total</div></div>
+    <div class="card tile"><div class="label">Verifications</div><div class="value">${v.length}</div>
+      <div class="note">${rej} photo${rej === 1 ? '' : 's'} rejected for quality</div></div>
+    <div class="card tile"><div class="label">Said “match”</div>
+      <div class="rows">${rows(m => v.length ? `${v.filter(h => h.results[m.key].match).length} of ${v.length}` : '–')}</div></div>
+    <div class="card tile"><div class="label">Median time per photo</div>
+      <div class="rows">${rows(m => v.length ? fmt(Math.round(median(v.map(h => h.results[m.key].ms)))) + ' ms' : '–')}</div></div>`;
+}
+
+function renderPeople() {
+  const sel = $('#person'), keep = sel.value;
+  sel.innerHTML = S.users.map(u => `<option value="${esc(u.id)}">${esc(u.name)} (${u.photos} photo${u.photos === 1 ? '' : 's'})</option>`).join('');
+  if (S.users.some(u => u.id === keep)) sel.value = keep;
+  $('#modeVerify').disabled = !S.users.length;
+  if (!S.users.length) { $('#people').innerHTML = '<div class="empty">Nobody enrolled yet.</div>'; return; }
+  $('#people').innerHTML = `<table><thead><tr><th>Name</th><th class="num">Photos</th><th class="num">Template size per photo</th><th></th></tr></thead><tbody>` +
+    S.users.map(u => `<tr><td>${esc(u.name)}<div class="since">since ${esc(u.created)}</div></td><td class="num">${u.photos} of ${S.max_photos}</td>
+      <td class="num">${S.models.map(m => `<div><span class="dot ${m.key}"></span>${m.name} ${kb(u.bytes[m.key] / u.photos)}</div>`).join('')}</td>
+      <td><button class="link" data-del="${esc(u.id)}" data-name="${esc(u.name)}">Delete</button></td></tr>`).join('') + '</tbody></table>';
+}
+
+function cell(r) { return r ? `<span class="${r.match ? 'yes-t' : 'no-t'}">${r.match ? '✓ match' : '✕ no match'}</span> <span style="color:var(--muted)">${fmt(r.score)}</span>` : ''; }
+function renderHistory() {
+  if (!S.history.length) { $('#history').innerHTML = '<div class="empty">Nothing yet.</div>'; return; }
+  $('#history').innerHTML = `<table><thead><tr><th>Time</th><th>Action</th><th>Person</th>${S.models.map(m => `<th><span class="dot ${m.key}"></span>${m.name}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>` +
+    S.history.slice(0, 40).map(h => {
+      let mid;
+      if (h.rejected) mid = `<td colspan="${S.models.length}" class="no-t">Photo rejected: ${esc(h.rejected)}</td>`;
+      else if (h.action === 'verify') mid = S.models.map(m => `<td>${cell(h.results[m.key])}</td>`).join('');
+      else if (h.action === 'enrol') mid = `<td colspan="${S.models.length}">Enrolled photo ${h.photo}</td>`;
+      else mid = `<td colspan="${S.models.length}">Person deleted</td>`;
+      return `<tr><td style="white-space:nowrap">${esc(h.time.slice(11))}</td><td>${esc(h.action)}</td><td>${esc(h.person || '')}</td>${mid}<td class="num">${h.total_ms ? fmt(h.total_ms) + ' ms' : ''}</td></tr>`;
+    }).join('') + '</tbody></table>';
+}
+
+function renderSamples() {
+  $('#sampleBox').hidden = !S.samples.length;
+  $('#samples').innerHTML = S.samples.map((s, i) => `<button data-sample="${esc(s.file)}" title="${esc(s.file)}"><img src="/api/sample/${encodeURIComponent(s.file)}" alt="">${esc(s.note || 'Sample ' + (i + 1))}</button>`).join('');
+}
+
+function renderHint() {
+  const n = $('#name').value.trim().toLowerCase(), u = S && S.users.find(x => x.name.toLowerCase() === n);
+  $('#enrolHint').textContent = !n ? `Up to ${S ? S.max_photos : 3} photos per person; 3 gives the best accuracy.` :
+    u ? (u.photos >= S.max_photos ? `${u.name} already has ${u.photos} photos.` : `${u.name} has ${u.photos} photo${u.photos === 1 ? '' : 's'}. The next one is photo ${u.photos + 1} of ${S.max_photos}.`) :
+    'New person. This will be photo 1.';
+}
+
+function render() {
+  $('#device').textContent = `Running on this computer (${S.device === 'cuda' ? 'GPU' : 'CPU'})`;
+  renderTiles(); renderPeople(); renderHistory(); renderHint();
+}
+
+function quality(q) {
+  return `<div class="facts"><span>Hand</span><b>${esc(q.hand)}</b><span>Photo size</span><b>${q.width} × ${q.height}</b>
+    <span>Noise level</span><b>${q.noise}${q.noisy ? ' (noisy: v3cr smooths it)' : ''}</b><span>Sharpness</span><b>${fmt(q.sharpness)}</b>
+    <span>Hand detection + alignment</span><b>${q.detect_ms} ms</b></div>`;
+}
+
+function showVerify(j) {
+  const person = S.users.find(u => u.name === j.person);
+  const cards = S.models.map(m => {
+    const r = j.results[m.key], w = Math.min(r.score / (4 * r.threshold), 1) * 100;
+    return `<div class="model"><div class="name"><span class="dot ${m.key}"></span>${m.name}</div><div class="detail">${esc(m.detail)}</div>
+      <span class="pill ${r.match ? 'yes' : 'no'}">${r.match ? '✓ MATCH' : '✕ NO MATCH'}</span>
+      <div class="score">${fmt(r.score)} <small>score</small></div>
+      <div class="meter" role="img" aria-label="score ${fmt(r.score)}, threshold ${r.threshold}"><i style="width:${w}%;background:${r.match ? 'var(--good)' : 'var(--muted)'}"></i><span class="tick"></span></div>
+      <div class="meterlabel"><span>0</span><span>threshold ${r.threshold}</span><span>${fmt(4 * r.threshold)}+</span></div>
+      <div class="kv"><span>Matched points</span><b>${r.inliers}</b><span>Palm area covered</span><b>${r.cells} of 64 cells</b>
+        <span>Best enrolled photo</span><b>photo ${r.photo}</b>${m.key === 'v3cr' ? `<span>Decided on</span><b>${esc(r.attempt)}</b>` : ''}
+        <span>Time (extract + match)</span><b>${r.extract_ms} + ${r.match_ms} ms</b>
+        <span>Template per photo</span><b>${person ? kb(person.bytes[m.key] / person.photos) : ''}</b></div></div>`;
+  }).join('');
+  const others = j.others.length > 1 ? `<div class="section"><h2>Score against every enrolled person</h2><div class="tablewrap"><table><thead><tr><th>Person</th>${S.models.map(m => `<th class="num"><span class="dot ${m.key}"></span>${m.name} (≥ ${m.threshold})</th>`).join('')}</tr></thead><tbody>` +
+    j.others.map(o => `<tr class="${o.claimed ? 'claimed' : ''}"><td>${esc(o.name)}${o.claimed ? ' (claimed)' : ''}</td>${S.models.map(m => { const s = o.scores[m.key], ok = s >= m.threshold; return `<td class="num"><span class="${ok ? 'yes-t' : ''}">${ok ? '✓ ' : ''}${fmt(s)}</span></td>`; }).join('')}</tr>`).join('') + '</tbody></table></div></div>' : '';
+  $('#result').innerHTML = `<div class="resulthead"><img src="${j.crop}" alt="Aligned palm crop used for matching">
+      <div><div class="t">Verified against ${esc(j.person)}</div>${quality(j.quality)}<div class="hint" style="margin-top:6px">Whole request: ${fmt(j.total_ms)} ms</div></div></div>
+    <div class="models">${cards}</div>${others}`;
+  const yes = S.models.filter(m => j.results[m.key].match).length;
+  say(yes === S.models.length ? 'ok' : yes ? 'info' : 'err', yes === S.models.length ? `All three versions say MATCH for ${j.person}.` : yes ? `${yes} of ${S.models.length} versions say MATCH for ${j.person}.` : `All three versions say NO MATCH for ${j.person}.`);
+}
+
+function showEnrol(j) {
+  $('#result').innerHTML = `<div class="resulthead"><img src="${j.crop}" alt="Aligned palm crop that was enrolled">
+    <div><div class="t">Enrolled photo ${j.photo} for ${esc(j.person)}</div>${quality(j.quality)}</div></div>
+    <div class="hint">This is the aligned palm crop the matchers use. The photo itself was not saved.</div>`;
+  say('ok', `Photo ${j.photo} enrolled for ${j.person}.` + (j.photo < S.max_photos ? ' Add another, or switch to Verify.' : ' Switch to Verify to test.'));
+}
+
+async function submit(body, source) {
+  if (busy) return;
+  const fd = new FormData();
+  if (body.sample) fd.append('sample', body.sample); else fd.append('image', body.blob, 'photo.jpg');
+  fd.append('source', source);
+  if (mode === 'enrol') {
+    if (!$('#name').value.trim()) { say('err', "Enter the person's name first."); $('#name').focus(); return; }
+    fd.append('name', $('#name').value);
+  } else {
+    if (!$('#person').value) { say('err', 'Enrol a person first.'); return; }
+    fd.append('person', $('#person').value);
+  }
+  setBusy(true);
+  try {
+    const r = await fetch(mode === 'enrol' ? '/api/enroll' : '/api/verify', {method: 'POST', body: fd});
+    const j = await r.json();
+    if (j.state) { S = j.state; render(); }
+    if (j.ok) (mode === 'enrol' ? showEnrol : showVerify)(j);
+    else say('err', (j.rejected ? 'Photo rejected: ' : '') + j.error);
+  } catch (e) {
+    say('err', 'Could not reach the app. Check that webapp/app.py is still running.');
+  } finally { busy = false; setBusy(false); if ($('#msg').textContent === 'Working…') $('#msg').className = 'msg'; }
+}
+
+async function post(url, data) {
+  const fd = new FormData(); for (const k in data) fd.append(k, data[k]);
+  const j = await (await fetch(url, {method: 'POST', body: fd})).json();
+  if (j.state) { S = j.state; render(); }
+}
+
+$('#modeEnrol').onclick = () => setMode('enrol');
+$('#modeVerify').onclick = () => setMode('verify');
+$('#name').oninput = renderHint;
+$('#camBtn').onclick = async () => {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; $('#stage').classList.remove('live'); $('#camBtn').textContent = 'Start camera'; $('#shotBtn').disabled = true; return; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { say('err', 'The live camera only works on this computer (localhost) or over https. Use “Upload photo” instead.'); return; }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video: {width: {ideal: 1920}, height: {ideal: 1080}}, audio: false});
+    $('#video').srcObject = stream; $('#stage').classList.add('live'); $('#camBtn').textContent = 'Stop camera'; $('#shotBtn').disabled = false;
+    say('info', 'Hold the open palm steady, close to the camera, then take the photo.');
+  } catch (e) { say('err', 'Could not open the camera: ' + e.message); }
+};
+$('#shotBtn').onclick = () => {
+  const v = $('#video'), c = document.createElement('canvas');
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  if (!c.width) { say('err', 'The camera is not ready yet.'); return; }
+  c.getContext('2d').drawImage(v, 0, 0);
+  c.toBlob(b => submit({blob: b}, 'camera'), 'image/jpeg', 0.95);
+};
+$('#upBtn').onclick = () => $('#file').click();
+$('#file').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) submit({blob: f}, 'upload'); };
+$('#samples').onclick = e => { const b = e.target.closest('button[data-sample]'); if (b) submit({sample: b.dataset.sample}, 'sample'); };
+$('#people').onclick = e => {
+  const b = e.target.closest('button[data-del]');
+  if (b && confirm(`Delete ${b.dataset.name} and their stored templates?`)) post('/api/delete_person', {person: b.dataset.del});
+};
+$('#clearBtn').onclick = () => { if (confirm('Clear the history table?')) post('/api/clear_history', {}); };
+
+(async () => {
+  try { S = await (await fetch('/api/state')).json(); render(); renderSamples(); setMode('enrol'); }
+  catch (e) { say('err', 'Could not load the app state.'); }
+})();
+</script>
+</body>
+</html>
