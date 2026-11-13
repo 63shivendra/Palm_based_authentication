@@ -1,0 +1,24 @@
+{
+  "note": "Template sizes: one enrolled phone photo saved with each program's enroll command. Model sizes: weight files on disk. Parameter counts: sum over the loaded PyTorch modules.",
+  "template_kb": {
+    "v3": 1065.7,
+    "v3c": 97.0
+  },
+  "models": [
+    [
+      "LightGlue matcher",
+      47.6,
+      11884625
+    ],
+    [
+      "Hand detector (MediaPipe)",
+      7.8,
+      null
+    ],
+    [
+      "DISK keypoint network",
+      4.4,
+      1092369
+    ]
+  ]
+}

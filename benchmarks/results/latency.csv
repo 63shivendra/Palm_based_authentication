@@ -1,0 +1,8 @@
+stage,GPU,CPU,machine
+"Hand detection (MediaPipe, 12 MP photo)",-,35 ms,"desktop PC, NVIDIA RTX 5080 GPU"
+"Alignment, crop, quality gates",-,1 ms,"desktop PC, NVIDIA RTX 5080 GPU"
+DISK feature extraction,14 ms,184 ms,"desktop PC, NVIDIA RTX 5080 GPU"
+"Match + verify, v3 (2,048 keypoints)",30 ms,430 ms,"desktop PC, NVIDIA RTX 5080 GPU"
+"Match + verify, v3c compact (1,024 keypoints)",21 ms,150 ms,"desktop PC, NVIDIA RTX 5080 GPU"
+"Total for one verification, v3",about 80 ms,about 650 ms,"desktop PC, NVIDIA RTX 5080 GPU"
+"Total for one verification, v3c compact",about 71 ms,about 370 ms,"desktop PC, NVIDIA RTX 5080 GPU"

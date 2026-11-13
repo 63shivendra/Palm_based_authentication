@@ -377,7 +377,8 @@ def save_templates_v2(path, templates):
 #     this widened the gap between the weakest genuine pair and the strongest impostor from 1.32x to 1.55x
 #     (5th-weakest vs 5th-strongest: 2.55x -> 5.03x), better in 500 of 500 bootstrap resamples.
 #   * NOVELTY 2 - multi-photo enrolment: enrol 2-3 photos, score = best match over the enrolled photos.
-#     On PalmMatchDB (trustworthy labels) single-photo EER 7.15% -> 0.00% with 3 enrolled photos.
+#     On PalmMatchDB (trustworthy labels) single-photo EER 1.32% -> 0.00% with 3 enrolled photos
+#     (benchmarks/results/REPORT.md; an early experiment with the raw inlier count measured 7.15%).
 V3_KEYPOINTS = 2048
 V3_GRID = 8
 V3_THRESHOLD = 26.0    # PROVISIONAL, coverage-weighted score. Tongji: impostor max 21.1 / genuine min 32.8;

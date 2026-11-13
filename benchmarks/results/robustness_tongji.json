@@ -1,0 +1,119 @@
+{
+  "clean (baseline)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 660.453125,
+    "impostor_max": 4.5,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "darker (x0.5)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 684.796875,
+    "impostor_max": 12.75,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "brighter (x1.5)": {
+    "FRR": 0.04,
+    "FAR": 0.0,
+    "EER": 0.020999999999999998,
+    "genuine_median": 615.2109375,
+    "impostor_max": 5.625,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "low contrast (x0.4)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 604.1640625,
+    "impostor_max": 3.5,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "uneven light (gradient)": {
+    "FRR": 0.005,
+    "FAR": 0.0,
+    "EER": 0.004833333333333334,
+    "genuine_median": 532.53125,
+    "impostor_max": 14.609375,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "blur (sigma 2)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 576.875,
+    "impostor_max": 5.15625,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "blur (sigma 4)": {
+    "FRR": 0.005,
+    "FAR": 0.0,
+    "EER": 0.005166666666666667,
+    "genuine_median": 401.578125,
+    "impostor_max": 2.625,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "rotation 10 deg": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 657.6796875,
+    "impostor_max": 8.625,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "rotation 20 deg": {
+    "FRR": 0.035,
+    "FAR": 0.0,
+    "EER": 0.015166666666666665,
+    "genuine_median": 627.4921875,
+    "impostor_max": 2.65625,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "closer (x1.15)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 528.953125,
+    "impostor_max": 4.375,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "farther (x0.85)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 539.0390625,
+    "impostor_max": 6.34375,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "sensor noise (sigma 12)": {
+    "FRR": 0.82,
+    "FAR": 0.0,
+    "EER": 0.2495,
+    "genuine_median": 0.09375,
+    "impostor_max": 0.25,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "JPEG quality 20": {
+    "FRR": 0.07,
+    "FAR": 0.0,
+    "EER": 0.01,
+    "genuine_median": 519.0234375,
+    "impostor_max": 5.53125,
+    "genuine": 200,
+    "impostor": 1500
+  }
+}

@@ -1,0 +1,17 @@
+Loaded LightGlue model
+200 palms, 200 genuine + 1500 impostor comparisons per condition, method v3c, threshold 12.0
+condition                      FRR     FAR     EER  genuine median score
+clean (baseline)             0.00%   0.00%   0.00%     304.7
+darker (x0.5)                0.00%   0.00%   0.00%     289.4
+brighter (x1.5)              4.00%   0.00%   2.48%     259.1
+low contrast (x0.4)          0.00%   0.00%   0.00%     279.3
+uneven light (gradient)      0.50%   0.00%   0.00%     257.0
+blur (sigma 2)               0.00%   0.00%   0.00%     297.6
+blur (sigma 4)               2.00%   0.00%   0.52%     197.9
+rotation 10 deg              0.00%   0.00%   0.00%     294.6
+rotation 20 deg              3.50%   0.00%   1.52%     271.7
+closer (x1.15)               0.00%   0.00%   0.00%     245.0
+farther (x0.85)              0.00%   0.00%   0.00%     235.7
+sensor noise (sigma 12)     56.00%   0.00%  14.78%       1.8
+JPEG quality 20              3.50%   0.00%   1.00%     217.4
+saved D:\PALM_payments\benchmarks\results\robustness_tongji_v3c.json

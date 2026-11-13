@@ -1,0 +1,9 @@
+dataset,status,source,licence,content_used,protocol_or_reason
+Tongji Contactless Palmprint,tested,cslinzhang.github.io/ContactlessPalm (official ROI images),No licence stated on the official page; treated as research-only. Used for evaluation only.,"600 palms, 2 sessions about 2 months apart, 12,000 pre-cropped 128x128 images; 3 images per palm per session used","enrol session 1, verify session 2"
+PalmMatchDB,tested,huggingface.co/datasets/aspmirlab/PalmMatchDB,Apache-2.0 (Hugging Face tag). Consent terms not verified.,"phone photos of whole hands; 10,528 files but only 531 distinct images; labels unreliable","all pairs, restricted to pairs with trustworthy labels (same palm: photos < 10 min apart; different palm: > 1 day apart)"
+Palmprint Image Dataset with Gabor Filter (raw images),tested,data.mendeley.com/datasets/r8hxykxnk5 (version 2),CC BY 4.0,"15 people, 103 raw 128x128 palm crops",all pairs
+Own phone photos,tested,real palm images/ in this repository,own data,"4 photos: 3 of one right hand (2 sessions), 1 of the left hand",all pairs
+CASIA Palmprint,not tested,,,,needs registration and a signed release agreement; official portal unreachable
+SCUT-PV (palm vein),not tested,,,,needs a signed agreement sent to the lab; commercial use not allowed; near-infrared images
+GenPalm,not tested,,,,"dataset announced in the paper, no public release found"
+PCE-SynthPalm (Kaggle),not tested,,,,no licence stated; project policy prohibits downloading it

@@ -1,0 +1,41 @@
+{
+  "machine": "desktop PC, NVIDIA RTX 5080 GPU",
+  "rows": [
+    [
+      "Hand detection (MediaPipe, 12 MP photo)",
+      "-",
+      "35 ms"
+    ],
+    [
+      "Alignment, crop, quality gates",
+      "-",
+      "1 ms"
+    ],
+    [
+      "DISK feature extraction",
+      "14 ms",
+      "184 ms"
+    ],
+    [
+      "Match + verify, v3 (2,048 keypoints)",
+      "30 ms",
+      "430 ms"
+    ],
+    [
+      "Match + verify, v3c compact (1,024 keypoints)",
+      "21 ms",
+      "150 ms"
+    ],
+    [
+      "Total for one verification, v3",
+      "about 80 ms",
+      "about 650 ms"
+    ],
+    [
+      "Total for one verification, v3c compact",
+      "about 71 ms",
+      "about 370 ms"
+    ]
+  ],
+  "note": "Totals = detection + alignment + extraction + one match. Each extra enrolled photo adds one match. Measured while another benchmark was using the GPU, so GPU figures are slightly high. Not measured on a phone or payment terminal."
+}

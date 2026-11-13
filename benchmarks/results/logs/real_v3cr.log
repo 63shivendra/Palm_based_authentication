@@ -1,0 +1,34 @@
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+WARNING: Logging before InitGoogle() is written to STDERR
+W0000 00:00:1794573099.126721    4816 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1794573099.133102    4816 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1794573099.162059   40940 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[real] 4 images, 2 identities, hand detection on, protocol all-vs-all
+Loaded LightGlue model
+
+=== real | method v3cr | protocol all-vs-all ===
+images 4  usable 4  identities 2  FTE 0.00% 
+comparisons: genuine 3  impostor 3
+at operating threshold (12.0 score): FMR 0.00%  FNMR 0.00%  |  system FAR 0.00%  FRR 0.00%
+EER 0.00% (at 33.7 score)   TAR@FMR=1e-2 n/a  1e-3 n/a  1e-4 n/a
+Rank-1 100.00% (2 probes, gallery 2)   d' 7.52   AUC 1.0000
+scores: genuine median 84.938 (worst 67.469)   impostor median 0.000 (most similar 0.000)   [25.1 s]
+
+=== real | method v3cr | protocol all-vs-all, 2-photo enrolment (1 palms enrolled) ===
+images 4  usable 4  identities 2  FTE 0.00% 
+comparisons: genuine 1  impostor 1
+at operating threshold (12.0 score): FMR 0.00%  FNMR 0.00%  |  system FAR 0.00%  FRR 0.00%
+EER 0.00% (at 42.5 score)   TAR@FMR=1e-2 n/a  1e-3 n/a  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 2)   d' 84937500.00   AUC 1.0000
+scores: genuine median 84.938 (worst 84.938)   impostor median 0.000 (most similar 0.000)   [25.3 s]
+
+saved D:\PALM_payments\benchmarks\results/real.json and score/DET plots
+WARNING: fewer than 20 identities - smoke test only, not an accuracy measurement.
+Note: claiming FAR <= 1e-5 needs >= 300,000 independent impostor comparisons (rule of 3).
+Exception ignored in: <function HandLandmarker.__del__ at 0x000001881B43A160>
+Traceback (most recent call last):
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\vision\hand_landmarker.py", line 614, in __del__
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\vision\hand_landmarker.py", line 590, in close
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\core\serial_dispatcher.py", line 74, in shutdown_aware_handler
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\core\mediapipe_c_utils.py", line 126, in dispatcher_wrapper
+TypeError: 'NoneType' object is not callable

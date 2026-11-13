@@ -1,0 +1,38 @@
+[folder] 103 images, 15 identities, hand detection off (ROI images), protocol all-vs-all
+Loaded LightGlue model
+
+=== gabor | method v3 | protocol all-vs-all ===
+images 103  usable 103  identities 15  FTE 0.00% 
+comparisons: genuine 311  impostor 4942
+at operating threshold (26.0 score): FMR 0.00%  FNMR 2.89%  |  system FAR 0.00%  FRR 2.89%
+EER 0.29% (at 2.1 score)   TAR@FMR=1e-2 100.00%  1e-3 99.36%  1e-4 n/a
+Rank-1 100.00% (88 probes, gallery 15)   d' 1.89   AUC 1.0000
+scores: genuine median 411.141 (worst 2.062)   impostor median 0.000 (most similar 7.219)   [126.0 s]
+
+=== gabor | method v3 | protocol all-vs-all, 3-photo enrolment (15 palms enrolled) ===
+images 103  usable 103  identities 15  FTE 0.00% 
+comparisons: genuine 58  impostor 812
+at operating threshold (26.0 score): FMR 0.00%  FNMR 1.72%  |  system FAR 0.00%  FRR 1.72%
+EER 0.00% (at 6.9 score)   TAR@FMR=1e-2 100.00%  1e-3 n/a  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 15)   d' 1.93   AUC 1.0000
+scores: genuine median 543.469 (worst 8.938)   impostor median 0.234 (most similar 4.922)   [142.5 s]
+
+=== gabor | method v3c | protocol all-vs-all ===
+images 103  usable 103  identities 15  FTE 0.00% 
+comparisons: genuine 311  impostor 4942
+at operating threshold (12.0 score): FMR 0.00%  FNMR 2.25%  |  system FAR 0.00%  FRR 2.25%
+EER 0.32% (at 2.3 score)   TAR@FMR=1e-2 99.68%  1e-3 99.04%  1e-4 n/a
+Rank-1 98.86% (88 probes, gallery 15)   d' 1.73   AUC 0.9999
+scores: genuine median 198.844 (worst 1.031)   impostor median 0.000 (most similar 7.734)   [101.7 s]
+
+=== gabor | method v3c | protocol all-vs-all, 3-photo enrolment (15 palms enrolled) ===
+images 103  usable 103  identities 15  FTE 0.00% 
+comparisons: genuine 58  impostor 812
+at operating threshold (12.0 score): FMR 0.00%  FNMR 0.00%  |  system FAR 0.00%  FRR 0.00%
+EER 0.00% (at 10.9 score)   TAR@FMR=1e-2 100.00%  1e-3 n/a  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 15)   d' 1.75   AUC 1.0000
+scores: genuine median 271.188 (worst 14.078)   impostor median 0.281 (most similar 7.734)   [115.6 s]
+
+saved D:\PALM_payments\benchmarks\results/gabor.json and score/DET plots
+WARNING: fewer than 20 identities - smoke test only, not an accuracy measurement.
+Note: claiming FAR <= 1e-5 needs >= 300,000 independent impostor comparisons (rule of 3).

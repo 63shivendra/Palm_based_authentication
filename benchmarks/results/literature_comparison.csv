@@ -1,0 +1,25 @@
+dataset,method,EER_pct,trained_on_palm_images,protocol,source
+Tongji,"OURS v3, 1 enrolled photo(s)",0.06,no (zero-shot),cross-session,"this repository, 2026-11-13"
+Tongji,"OURS v3, 3 enrolled photo(s)",0.00,no (zero-shot),"cross-session, 3-photo enrolment (600 palms enrolled)","this repository, 2026-11-13"
+Tongji,"OURS v3c, 1 enrolled photo(s)",0.05,no (zero-shot),cross-session,"this repository, 2026-11-13"
+Tongji,"OURS v3c, 3 enrolled photo(s)",0.00,no (zero-shot),"cross-session, 3-photo enrolment (600 palms enrolled)","this repository, 2026-11-13"
+Tongji,CCNet,0.00004,"yes, on Tongji","closed-set, train and test split of Tongji",survey arXiv:2501.01166; arXiv:2504.11306
+Tongji,BOCV,0.0056,no (hand-crafted),within Tongji,survey tables found in the literature search
+Tongji,CompNet,0.018 to 0.025,"yes, on Tongji",closed-set,arXiv:2501.01166 (0.018); arXiv:2504.11306 (0.025)
+Tongji,PalmNet,0.03 to 0.17,partly (Gabor/PCA filters tuned on palms),within Tongji,survey tables found in the literature search
+Tongji,DHPN,0.066,yes,within Tongji,survey tables found in the literature search
+Tongji,DHN,0.088,yes,within Tongji,survey tables found in the literature search
+Tongji,CompCode,0.10 to 0.11,no (hand-crafted),within Tongji,arXiv:2504.11306 and survey tables
+Tongji,"CCNet, trained on PolyU",2.22,"yes, on another dataset",cross-dataset (PolyU to Tongji),survey arXiv:2501.01166
+Tongji,"PalmBridge, trained on PolyU",2.25,"yes, on another dataset",cross-dataset open-set,arXiv:2601.20351
+Tongji,"PalmBridge, trained on IITD",2.88,"yes, on another dataset",cross-dataset open-set,arXiv:2601.20351
+PalmMatchDB,"OURS v3, 1 enrolled photo(s)",1.32,no (zero-shot),all-vs-all (trusted-label pairs),"this repository, 2026-11-13"
+PalmMatchDB,"OURS v3, 3 enrolled photo(s)",0.00,no (zero-shot),"all-vs-all (trusted-label pairs), 3-photo enrolment (36 palms enrolled)","this repository, 2026-11-13"
+PalmMatchDB,"OURS v3c, 1 enrolled photo(s)",1.11,no (zero-shot),all-vs-all (trusted-label pairs),"this repository, 2026-11-13"
+PalmMatchDB,"OURS v3c, 3 enrolled photo(s)",0.00,no (zero-shot),"all-vs-all (trusted-label pairs), 3-photo enrolment (36 palms enrolled)","this repository, 2026-11-13"
+PalmMatchDB,no published EER found,,,"The dataset paper (Alausa et al., ICPECA 2023, IEEE Xplore 10076097) is paywalled; its results could not be read. No other paper reporting on this dataset was found.","web search, 2026-11-13"
+Palmprint Image Dataset with Gabor Filter,"OURS v3, 1 enrolled photo(s)",0.29,no (zero-shot),all-vs-all,"this repository, 2026-11-13"
+Palmprint Image Dataset with Gabor Filter,"OURS v3, 3 enrolled photo(s)",0.00,no (zero-shot),"all-vs-all, 3-photo enrolment (15 palms enrolled)","this repository, 2026-11-13"
+Palmprint Image Dataset with Gabor Filter,"OURS v3c, 1 enrolled photo(s)",0.32,no (zero-shot),all-vs-all,"this repository, 2026-11-13"
+Palmprint Image Dataset with Gabor Filter,"OURS v3c, 3 enrolled photo(s)",0.00,no (zero-shot),"all-vs-all, 3-photo enrolment (15 palms enrolled)","this repository, 2026-11-13"
+Palmprint Image Dataset with Gabor Filter,no published result found,,,Mendeley Data record only; no paper reporting verification results on it was found.,"web search, 2026-11-13"

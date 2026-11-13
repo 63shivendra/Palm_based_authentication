@@ -6,6 +6,8 @@ ISO/IEC 19795-1 style evaluation of training-free palm matchers on several palm 
   v1 = palm_match.py Competitive Code
   v2 = palm_match.py 7-landmark alignment + Tan-Triggs + crease-scale SIFT/RANSAC
   v3 = same alignment, then DISK keypoints + LightGlue transformer matcher (pretrained, zero-shot; needs kornia)
+  v3c = v3 with the compact template of palm_match_compact.py (1,024 keypoints, 1-byte descriptors)
+  v3cr = v3c with noise-adaptive smoothing and retry on failure (palm_match_robust.py)
 
 Datasets (--dataset):
   real        real palm images/  (flat folder; 1000132768 is the LEFT hand, the rest the right hand)
@@ -53,6 +55,8 @@ import numpy as np
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
 import palm_match as pm  # noqa: E402
+import palm_match_compact as pmc  # noqa: E402
+import palm_match_robust as pmr  # noqa: E402
 
 IMG_EXT = (".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff")
 
@@ -191,6 +195,10 @@ def extract(sample, method, detect):
     img = sample[2]
     if isinstance(img, str):
         img = load_any(img)
+    if method == "v3cr":                            # [first attempt, retries...]; [0] is also the enrolment template
+        return pmr.make_probe(img, detect)
+    if method == "v3c":
+        return pmc.make_template(img, detect)
     if method == "v3":
         return pm.make_template_v3(img, detect)
     if method == "v2":
@@ -248,6 +256,10 @@ class V3Scorer:
 
 
 def make_scorer(method, feats):
+    if method == "v3cr":
+        return lambda a, b: float(pmr.match(feats[a][0], feats[b])["score"])
+    if method == "v3c":                             # unpack once, then the same matcher as v3
+        return V3Scorer([pmc.unpack(f) for f in feats])
     if method == "v3":
         return V3Scorer(feats)
     if method == "v2":
@@ -417,7 +429,7 @@ def evaluate(samples, method, detect, protocol, threshold, max_imp, seed, max_pr
         hits += right > max(v for k, v in sc.items() if k != ids[p]) if len(sc) > 1 else 0
 
     if threshold is None:
-        threshold = {"v2": pm.MIN_INLIERS, "v3": pm.V3_THRESHOLD}.get(method, -pm.DEFAULT_THRESHOLD)
+        threshold = {"v2": pm.MIN_INLIERS, "v3": pm.V3_THRESHOLD, "v3c": pmc.THRESHOLD, "v3cr": pmr.THRESHOLD}.get(method, -pm.DEFAULT_THRESHOLD)
     fta = n_fte / max(len(samples), 1)
     base = dict(method=method, protocol=protocol + (" (trusted-label pairs)" if trusted else ""),
                 images=len(samples), usable=len(keep), identities=len(set(ids)),
@@ -448,7 +460,7 @@ def print_report(name, r):
     print(f"\n=== {name} | method {r['method']} | protocol {r['protocol']} ===")
     print(f"images {r['images']}  usable {r['usable']}  identities {r['identities']}  FTE {fmt(r['fte_rate'])} {r['fte_reasons'] or ''}")
     print(f"comparisons: genuine {r['genuine_comparisons']}  impostor {r['impostor_comparisons']}")
-    unit = {"v3": "score", "v2": "inliers"}.get(r['method'])
+    unit = {"v3": "score", "v3c": "score", "v3cr": "score", "v2": "inliers"}.get(r['method'])
     thr = f"{r['threshold']:.1f} {unit}" if unit else f"distance {-r['threshold']:.3f}"
     print(f"at operating threshold ({thr}): FMR {fmt(r['FMR'])}  FNMR {fmt(r['FNMR'])}  |  system FAR {fmt(r['FAR'])}  FRR {fmt(r['FRR'])}")
     et = f"{r['EER_threshold']:.1f} {unit}" if unit else f"distance {-r['EER_threshold']:.3f}"
@@ -483,7 +495,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dataset", required=True, choices=sorted(LOADERS))
     ap.add_argument("--root", default=None)
-    ap.add_argument("--methods", nargs="+", default=["v3"], choices=["v1", "v2", "v3"])
+    ap.add_argument("--methods", nargs="+", default=["v3"], choices=["v1", "v2", "v3", "v3c", "v3cr"])
     ap.add_argument("--enrol", type=int, default=1, help="also report N-photo enrolment (e.g. 3)")
     ap.add_argument("--all-pairs", action="store_true",
                     help="palmmatchdb: use raw labels (default keeps only trustworthy-label pairs)")
@@ -494,6 +506,7 @@ def main():
     ap.add_argument("--threshold", type=float, default=None, help="operating threshold (v2: inliers)")
     ap.add_argument("--no-detect", action="store_true", help="folder/casia: images are palm ROIs already")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--name", default=None, help="name used for the result files (default: the dataset key)")
     ap.add_argument("--out", default=os.path.join(REPO, "benchmarks", "results"))
     a = ap.parse_args()
     samples, detect, protocol = LOADERS[a.dataset](root=a.root, ids=a.ids, per_id=a.per_id, seed=a.seed,
@@ -501,22 +514,24 @@ def main():
     print(f"[{a.dataset}] {len(samples)} images, {len({s[0] for s in samples})} identities, "
           f"hand detection {'on' if detect else 'off (ROI images)'}, protocol {protocol}")
     os.makedirs(a.out, exist_ok=True)
+    name = a.name or a.dataset
     report = {}
     for m in a.methods:
         trusted = a.dataset == "palmmatchdb" and not a.all_pairs
         res = evaluate(samples, m, detect, protocol, a.threshold if m != "v1" else None, a.max_impostor, a.seed,
                        a.max_probes, trusted=trusted, n_enrol=a.enrol)
         if isinstance(res, dict):
-            print_report(a.dataset, res); report[m] = res; continue
+            print_report(name, res); report[m] = res; continue
         for key, r, gen, imp in res:
-            print_report(a.dataset, r); report[key] = r
-            save_plot(os.path.join(a.out, f"{a.dataset}_{key}.png"), f"{a.dataset} - palm_match {key}", gen, imp, m)
-    jpath = os.path.join(a.out, f"{a.dataset}.json")
+            print_report(name, r); report[key] = r
+            save_plot(os.path.join(a.out, f"{name}_{key}.png"), f"{name} - palm_match {key}", gen, imp, m)
+            np.savez_compressed(os.path.join(a.out, f"{name}_{key}_scores.npz"), genuine=gen, impostor=imp)
+    jpath = os.path.join(a.out, f"{name}.json")
     if os.path.exists(jpath):                                  # keep results of methods not re-run this time
         report = {**json.load(open(jpath)), **report}
     with open(jpath, "w") as f:
         json.dump(report, f, indent=2)
-    print(f"\nsaved {a.out}/{a.dataset}.json and score/DET plots")
+    print(f"\nsaved {a.out}/{name}.json and score/DET plots")
     if any(isinstance(r, dict) and r.get("identities", 0) < 20 for r in report.values()):
         print("WARNING: fewer than 20 identities - smoke test only, not an accuracy measurement.")
     print("Note: claiming FAR <= 1e-5 needs >= 300,000 independent impostor comparisons (rule of 3).")
