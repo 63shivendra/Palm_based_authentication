@@ -1,0 +1,22 @@
+[folder] 103 images, 15 identities, hand detection off (ROI images), protocol all-vs-all
+Loaded LightGlue model
+
+=== gabor | method v3cr | protocol all-vs-all ===
+images 103  usable 103  identities 15  FTE 0.00% 
+comparisons: genuine 311  impostor 4942
+at operating threshold (12.0 score): FMR 0.00%  FNMR 0.96%  |  system FAR 0.00%  FRR 0.96%
+EER 0.32% (at 2.8 score)   TAR@FMR=1e-2 99.68%  1e-3 99.04%  1e-4 n/a
+Rank-1 100.00% (88 probes, gallery 15)   d' 1.73   AUC 0.9999
+scores: genuine median 198.844 (worst 1.490)   impostor median 0.219 (most similar 7.734)   [338.0 s]
+
+=== gabor | method v3cr | protocol all-vs-all, 3-photo enrolment (15 palms enrolled) ===
+images 103  usable 103  identities 15  FTE 0.00% 
+comparisons: genuine 58  impostor 812
+at operating threshold (12.0 score): FMR 0.00%  FNMR 0.00%  |  system FAR 0.00%  FRR 0.00%
+EER 0.00% (at 10.9 score)   TAR@FMR=1e-2 100.00%  1e-3 n/a  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 15)   d' 1.75   AUC 1.0000
+scores: genuine median 271.188 (worst 14.078)   impostor median 0.375 (most similar 7.734)   [385.7 s]
+
+saved D:\PALM_payments\benchmarks\results/gabor.json and score/DET plots
+WARNING: fewer than 20 identities - smoke test only, not an accuracy measurement.
+Note: claiming FAR <= 1e-5 needs >= 300,000 independent impostor comparisons (rule of 3).

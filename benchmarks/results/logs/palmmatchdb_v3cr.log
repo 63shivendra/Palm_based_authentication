@@ -3,3 +3,32 @@ WARNING: Logging before InitGoogle() is written to STDERR
 W0000 00:00:1794573106.642172   10352 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
 W0000 00:00:1794573106.649291   10936 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
 W0000 00:00:1794573106.667952    4256 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[palmmatchdb] 10528 files -> 531 distinct images, 50 palms (subject+hand), 39 with 2+ images, 172 images dropped (appear under 2+ palms), 160 unparsed
+[palmmatchdb] 215 images, 39 identities, hand detection on, protocol all-vs-all
+Loaded LightGlue model
+
+=== palmmatchdb | method v3cr | protocol all-vs-all (trusted-label pairs) ===
+images 215  usable 208  identities 39  FTE 3.26% {'photo too blurry': 6, 'no hand found': 1}
+comparisons: genuine 453  impostor 11372
+at operating threshold (12.0 score): FMR 0.00%  FNMR 3.31%  |  system FAR 0.00%  FRR 6.46%
+EER 1.32% (at 2.5 score)   TAR@FMR=1e-2 98.45%  1e-3 98.01%  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 39)   d' 3.89   AUC 0.9976
+scores: genuine median 317.484 (worst 0.219)   impostor median 0.167 (most similar 11.083)   [817.7 s]
+
+=== palmmatchdb | method v3cr | protocol all-vs-all (trusted-label pairs), 3-photo enrolment (36 palms enrolled) ===
+images 215  usable 208  identities 39  FTE 3.26% {'photo too blurry': 6, 'no hand found': 1}
+comparisons: genuine 95  impostor 1831
+at operating threshold (12.0 score): FMR 0.00%  FNMR 0.00%  |  system FAR 0.00%  FRR 3.26%
+EER 0.00% (at 42.2 score)   TAR@FMR=1e-2 100.00%  1e-3 n/a  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 39)   d' 6.43   AUC 1.0000
+scores: genuine median 358.500 (worst 78.422)   impostor median 0.328 (most similar 5.938)   [991.8 s]
+
+saved D:\PALM_payments\benchmarks\results/palmmatchdb.json and score/DET plots
+Note: claiming FAR <= 1e-5 needs >= 300,000 independent impostor comparisons (rule of 3).
+Exception ignored in: <function HandLandmarker.__del__ at 0x00000234028E2340>
+Traceback (most recent call last):
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\vision\hand_landmarker.py", line 614, in __del__
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\vision\hand_landmarker.py", line 590, in close
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\core\serial_dispatcher.py", line 74, in shutdown_aware_handler
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\core\mediapipe_c_utils.py", line 126, in dispatcher_wrapper
+TypeError: 'NoneType' object is not callable
