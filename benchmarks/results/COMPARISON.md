@@ -90,7 +90,19 @@ The laptop CPU is several times slower than the desktop. v4 adds about 15% to te
 | Capture quality | blur and distance only | exposure, focus, faint creases, palm size, tilt, open hand, with a retake instruction | limits set on DEV photos |
 | Product | comparison dashboard | kiosk: register, automatic palm ID, duplicate check, pay, admin, audit log | end-to-end tests |
 
-## 7. Bottom line
+## 7. Against published methods on the same datasets
+
+Charts made by `benchmarks/plot_literature.py`.
+
+**Like for like** (`plots/like_for_like.png`): two published methods re-implemented in `palm_match.py` and run on exactly the same test people and comparisons as v4: CompCode (Kong & Zhang 2004, our v1) and SIFT + RANSAC (Wu, Zhao & Bu 2014, our v2). v4 has the lowest or equal EER on every dataset except PalmMatchDB, where SIFT is lower (0.8% vs 1.3%). On BJTU: v4 10.2%, CompCode 11.6%, SIFT 12.7%, v3c 15.9%.
+
+![like for like](plots/like_for_like.png)
+
+**Published numbers** (`plots/literature_tongji.png`): only Tongji has published results we could find. No published palm results were found for PalmMatchDB, the Gabor set, 11k Hands (palm side) or BJTU v2; the paper introducing XINHUA (PeerJ CS 2025) could not be retrieved. On Tongji, our zero-shot v3c (0.054%, 600 palms) is about 40x below models trained on another dataset (2.2-2.9%), below hand-crafted CompCode (0.10%) and similar to several models trained on Tongji itself (DHPN 0.066%, PalmNet 0.03-0.17%); CCNet, CompNet and BOCV trained or tuned on Tongji are lower. Protocols differ between papers.
+
+![Tongji literature](plots/literature_tongji.png)
+
+## 8. Bottom line
 
 - On the same people, v4 lowers the error where v3c was weak (BJTU, Gabor) and removes the noise and JPEG failures, at the cost of more retake requests (PalmMatchDB: 21% of photos sent back).
 - Where v3c was already at 0%, v4 stays at 0%: the quick test cannot show smaller differences.
