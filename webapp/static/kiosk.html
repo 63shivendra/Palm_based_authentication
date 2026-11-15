@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palm Kiosk</title>
+<style>
+:root {
+  --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eef0f3; --ink: #15181d; --ink-2: #4a515c; --ink-3: #7a828e;
+  --line: #dfe2e7; --accent: #2a62d6; --accent-ink: #ffffff; --good: #16833f; --good-bg: #e6f4ea; --bad: #c0392b;
+  --bad-bg: #fbeae8; --warn: #9a6400; --warn-bg: #fdf2dc; --overlay: rgba(10, 14, 20, .55); --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115; --surface: #171a20; --surface-2: #1f232b; --ink: #eceef2; --ink-2: #b4bac4; --ink-3: #858c97;
+    --line: #2a2f38; --accent: #5b8cff; --accent-ink: #0b0d11; --good: #4cc27a; --good-bg: #13291c; --bad: #ff7a6b;
+    --bad-bg: #321613; --warn: #f0b552; --warn-bg: #2e2412; --overlay: rgba(0, 0, 0, .6);
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+header h1 { font-size: 17px; margin: 0; font-weight: 650; letter-spacing: .2px; }
+header nav { display: flex; gap: 4px; margin-left: 8px; }
+header nav button { background: none; border: 0; padding: 7px 12px; border-radius: 8px; color: var(--ink-2); font: inherit; cursor: pointer; }
+header nav button.on { background: var(--surface-2); color: var(--ink); font-weight: 600; }
+.chips { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { font-size: 12.5px; padding: 4px 10px; border-radius: 99px; background: var(--surface-2); color: var(--ink-2); }
+main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+.hidden { display: none !important; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+.card h2 { margin: 0 0 6px; font-size: 20px; }
+.card p { margin: 0 0 16px; color: var(--ink-2); }
+label { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 6px; }
+input[type=text], input[type=number] { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; margin-bottom: 14px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.wide { width: 100%; padding: 14px; font-size: 16px; }
+.btn.small { padding: 6px 10px; font-size: 13px; font-weight: 500; }
+.btn.danger { color: var(--bad); }
+.btn:disabled { opacity: .5; cursor: default; }
+.note { font-size: 13px; color: var(--ink-3); margin-top: 18px; }
+.capture { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
+@media (max-width: 860px) { .capture { grid-template-columns: 1fr; } }
+.stage { position: relative; background: #000; border-radius: var(--radius); overflow: hidden; aspect-ratio: 16 / 9; }
+.stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.stage video { transform: scaleX(-1); }
+.prompt { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 20px; background: linear-gradient(transparent, var(--overlay) 35%); color: #fff; font-size: 26px; font-weight: 650; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+.prompt small { display: block; font-size: 14px; font-weight: 500; opacity: .85; margin-top: 2px; }
+.badge { position: absolute; top: 14px; left: 14px; padding: 5px 10px; border-radius: 99px; background: var(--overlay); color: #fff; font-size: 13px; }
+.side { display: flex; flex-direction: column; gap: 14px; }
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--ink-3); }
+.steps li:last-child { border-bottom: 0; }
+.steps li .dot { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.steps li.active { color: var(--ink); }
+.steps li.active .dot { border-color: var(--accent); color: var(--accent); }
+.steps li.done .dot { background: var(--good); border-color: var(--good); color: #fff; }
+.steps li .sub { font-size: 13px; color: var(--ink-3); }
+.pips { display: flex; gap: 5px; margin-top: 6px; }
+.pips span { width: 22px; height: 6px; border-radius: 3px; background: var(--line); }
+.pips span.on { background: var(--good); }
+.pips span.cur { background: var(--accent); }
+.readout { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; font-size: 13.5px; }
+.readout div span { display: block; color: var(--ink-3); font-size: 12px; }
+.readout b { font-variant-numeric: tabular-nums; font-weight: 600; }
+.meter { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 4px; }
+.meter i { display: block; height: 100%; background: var(--good); width: 0; transition: width .2s; }
+.issues { margin: 6px 0 0; padding-left: 18px; color: var(--warn); font-size: 13.5px; }
+.result { max-width: 620px; margin: 0 auto; text-align: center; }
+.result .icon { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; margin: 4px auto 14px; font-size: 38px; font-weight: 700; }
+.result.ok .icon { background: var(--good-bg); color: var(--good); }
+.result.bad .icon { background: var(--bad-bg); color: var(--bad); }
+.result h2 { font-size: 24px; margin: 0 0 4px; }
+.result .pid { font-size: 34px; font-weight: 750; letter-spacing: 1px; margin: 8px 0; font-variant-numeric: tabular-nums; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; text-align: left; margin: 18px auto 0; max-width: 460px; font-size: 13.5px; }
+.kv span { color: var(--ink-3); }
+.kv b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.actions { display: flex; gap: 10px; justify-content: center; margin-top: 22px; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--ink-3); font-weight: 600; font-size: 12.5px; }
+td.num { font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 99px; font-size: 12px; background: var(--surface-2); color: var(--ink-2); }
+.pill.good { background: var(--good-bg); color: var(--good); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.pill.warn { background: var(--warn-bg); color: var(--warn); }
+.admin { display: grid; gap: 18px; }
+.admin .head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.admin h2 { font-size: 17px; margin: 0; }
+.scroll { overflow-x: auto; }
+.empty { color: var(--ink-3); padding: 16px 0; }
+.error { background: var(--bad-bg); color: var(--bad); padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Palm Kiosk</h1>
+  <nav><button id="nav-kiosk" class="on">Kiosk</button><button id="nav-admin">Admin</button></nav>
+  <div class="chips"><span class="chip" id="chip-people">–</span><span class="chip" id="chip-device">–</span><span class="chip" id="chip-pad">–</span></div>
+</header>
+<main>
+  <div id="error" class="error hidden"></div>
+
+  <section id="view-home">
+    <div class="cards">
+      <div class="card">
+        <h2>Register a palm</h2>
+        <p>Show your open palm, follow the finger prompts, and get a palm ID. The same palm cannot be registered twice.</p>
+        <label for="reg-name">Name (optional, shown to the admin only)</label>
+        <input id="reg-name" type="text" maxlength="40" placeholder="e.g. Asha" autocomplete="off">
+        <button class="btn primary wide" id="go-register">Register palm</button>
+      </div>
+      <div class="card">
+        <h2>Pay with palm</h2>
+        <p>No phone, no card: show your registered palm and follow the prompts. The kiosk finds who you are.</p>
+        <label for="amount">Amount (demo)</label>
+        <input id="amount" type="number" min="1" step="1" value="120">
+        <button class="btn primary wide" id="go-pay">Pay with palm</button>
+      </div>
+    </div>
+    <p class="note">Photos are processed in memory and never saved. Stored per person: encrypted palm templates and a 512-byte
+      cancellable search template. Liveness: random finger counts checked on the server.</p>
+  </section>
+
+  <section id="view-capture" class="hidden">
+    <div class="capture">
+      <div class="stage">
+        <video id="video" playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="badge" id="mode-badge">–</div>
+        <div class="prompt" id="prompt">Starting camera…<small id="prompt-sub"></small></div>
+      </div>
+      <div class="side">
+        <div class="card">
+          <ol class="steps">
+            <li id="st-position"><span class="dot">1</span><div>Position your palm<div class="sub" id="st-position-sub">sharp, well lit, open</div></div></li>
+            <li id="st-liveness"><span class="dot">2</span><div>Liveness check<div class="sub">follow the finger prompts</div><div class="pips" id="pips"></div></div></li>
+            <li id="st-capture"><span class="dot">3</span><div>Capture<div class="sub" id="st-capture-sub">hold the open hand still</div></div></li>
+            <li id="st-process"><span class="dot">4</span><div id="st-process-label">Match</div></li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="readout">
+            <div><span>Fingers</span><b id="r-count">–</b></div>
+            <div><span>Finger spread</span><b id="r-spread">–</b></div>
+            <div><span>Photo quality</span><b id="r-quality">–</b><div class="meter"><i id="r-meter"></i></div></div>
+            <div><span>Server time / frame</span><b id="r-ms">–</b></div>
+          </div>
+          <ul class="issues" id="issues"></ul>
+        </div>
+        <button class="btn" id="cancel">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-result" class="hidden">
+    <div class="card result" id="result"></div>
+  </section>
+
+  <section id="view-admin" class="hidden">
+    <div class="admin">
+      <div class="card">
+        <div class="head"><h2>Registered palms</h2><span class="pill" id="lock-pill"></span></div>
+        <div class="scroll"><table><thead><tr><th>ID</th><th>Name</th><th>Registered</th><th>Photos</th><th>Encrypted templates</th><th>Search template</th><th></th></tr></thead><tbody id="people"></tbody></table></div>
+        <div class="empty hidden" id="people-empty">Nobody registered yet.</div>
+      </div>
+      <div class="card">
+        <div class="head"><h2>Audit log</h2><a class="btn small" href="/api/kiosk/audit.csv">Export CSV</a></div>
+        <div class="scroll"><table><thead><tr><th>Time</th><th>Action</th><th>Outcome</th><th>ID</th><th>Score</th><th>Spoof score</th><th>Time (ms)</th></tr></thead><tbody id="audit"></tbody></table></div>
+        <div class="empty hidden" id="audit-empty">No events yet.</div>
+      </div>
+      <div class="card">
+        <div class="head"><h2>Configuration</h2></div>
+        <div class="kv" id="config" style="max-width:none;margin:0"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const views = ["home", "capture", "result", "admin"];
+let state = null, session = null, mode = null, stream = null, running = false, lastSteps = 0;
+const grab = document.createElement("canvas");
+
+function show(v) { views.forEach(x => $("view-" + x).classList.toggle("hidden", x !== v)); }
+function err(msg) { const e = $("error"); e.textContent = msg || ""; e.classList.toggle("hidden", !msg); }
+async function post(url, data, blob) {
+  const fd = new FormData();
+  Object.entries(data || {}).forEach(([k, v]) => fd.append(k, v));
+  if (blob) fd.append("image", blob, "frame.jpg");
+  const r = await fetch(url, { method: "POST", body: fd });
+  const j = await r.json().catch(() => ({ error: "server error" }));
+  if (!r.ok) throw new Error(j.error || ("HTTP " + r.status));
+  return j;
+}
+async function refresh() {
+  state = await (await fetch("/api/kiosk/state")).json();
+  $("chip-people").textContent = `${state.people.length} registered`;
+  $("chip-device").textContent = `matcher on ${state.config.device.toUpperCase()}`;
+  $("chip-pad").textContent = `screen/print check: ${state.config.pad === "enforce" ? "enforced" : "warn only"}`;
+  renderAdmin();
+}
+
+// ------------------------------------------------------------------ capture flow
+async function start(m) {
+  err(""); mode = m;
+  try {
+    const j = await post("/api/kiosk/start", { mode: m, name: $("reg-name").value });
+    session = j.session; lastSteps = j.steps;
+  } catch (e) { err(e.message); return; }
+  $("mode-badge").textContent = m === "register" ? "Register" : `Pay ₹${$("amount").value || 0}`;
+  $("st-process-label").textContent = m === "register" ? "Duplicate check and palm ID" : "Find your palm ID";
+  ["position", "liveness", "capture", "process"].forEach(s => $("st-" + s).className = "");
+  $("pips").innerHTML = Array.from({ length: lastSteps }, () => "<span></span>").join("");
+  show("capture");
+  try {
+    if (!stream) stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }, audio: false });
+  } catch (e) { err("Camera not available: " + e.message); show("home"); return; }
+  const v = $("video"); v.srcObject = stream; await v.play();
+  running = true; loop();
+}
+
+async function loop() {
+  const v = $("video");
+  while (running && session) {
+    if (!v.videoWidth) { await new Promise(r => setTimeout(r, 100)); continue; }
+    grab.width = v.videoWidth; grab.height = v.videoHeight;
+    grab.getContext("2d").drawImage(v, 0, 0);
+    const blob = await new Promise(r => grab.toBlob(r, "image/jpeg", 0.9));
+    let j;
+    try { j = await post("/api/kiosk/frame", { session }, blob); }
+    catch (e) { err(e.message); stop(); show("home"); return; }
+    if (!running) return;
+    render(j);
+    if (j.phase === "captured") { await finish(); return; }
+    if (j.phase === "done") { stop(); showResult(j.result); return; }
+  }
+}
+
+function render(j) {
+  $("prompt").firstChild.textContent = (j.prompt || "").replace(/^./, c => c.toUpperCase());
+  const lv = j.liveness;
+  $("prompt-sub").textContent = j.phase === "liveness" && lv ? `step ${Math.min(lv.step + 1, lv.steps)} of ${lv.steps}` :
+    j.phase === "capture" ? `photo ${j.photos + 1} of ${j.photos_needed}` : "";
+  const order = ["position", "liveness", "capture", "captured"];
+  const k = order.indexOf(j.phase);
+  ["position", "liveness", "capture", "process"].forEach((s, i) => $("st-" + s).className = i < k ? "done" : i === k ? "active" : "");
+  if (lv) [...$("pips").children].forEach((p, i) => p.className = i < lv.step ? "on" : i === lv.step && lv.status === "running" ? "cur" : "");
+  $("st-capture-sub").textContent = `${j.photos} of ${j.photos_needed} photos`;
+  const h = j.hand;
+  $("r-count").textContent = h ? h.count ?? "–" : "no hand";
+  $("r-spread").textContent = h ? `${h.spread}°` : "–";
+  $("r-quality").textContent = h && h.quality ? `${h.quality}/100` : "–";
+  $("r-meter").style.width = `${h && h.quality ? h.quality : 0}%`;
+  $("r-ms").textContent = j.ms != null ? `${j.ms} ms` : "–";
+  $("issues").innerHTML = (j.issues || []).map(x => `<li>${x}</li>`).join("");
+  draw(h);
+}
+
+const BONES = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+function draw(h) {
+  const c = $("overlay"), v = $("video");
+  const W = c.clientWidth, H = c.clientHeight;
+  c.width = W * devicePixelRatio; c.height = H * devicePixelRatio;
+  const g = c.getContext("2d"); g.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); g.clearRect(0, 0, W, H);
+  if (!h || !v.videoWidth) return;
+  const s = Math.max(W / v.videoWidth, H / v.videoHeight), ox = (W - v.videoWidth * s) / 2, oy = (H - v.videoHeight * s) / 2;
+  const P = h.pts.map(([x, y]) => [W - (ox + x * s), oy + y * s]);       // mirrored like the video
+  g.lineWidth = 3; g.strokeStyle = "rgba(91,140,255,.9)"; g.lineCap = "round";
+  BONES.forEach(([a, b]) => { g.beginPath(); g.moveTo(...P[a]); g.lineTo(...P[b]); g.stroke(); });
+  g.fillStyle = "#fff"; P.forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 3.5, 0, 7); g.fill(); });
+}
+
+async function finish() {
+  running = false;
+  $("prompt").firstChild.textContent = mode === "register" ? "Creating your palm ID…" : "Finding your palm ID…";
+  $("prompt-sub").textContent = "";
+  $("st-process").className = "active";
+  try { const j = await post("/api/kiosk/finish", { session }); showResult(j.result); }
+  catch (e) { err(e.message); show("home"); }
+  session = null; stopCamera(); refresh();
+}
+
+function stop() { running = false; if (session) post("/api/kiosk/cancel", { session }).catch(() => {}); session = null; stopCamera(); }
+function stopCamera() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
+
+function showResult(r) {
+  const ok = !!r.ok;
+  const t = r.timing || {}, p = r.pad;
+  const rows = [];
+  if (r.score != null) rows.push(["Match score", `${r.score} (threshold ${state.config.threshold})`]);
+  if (r.kind === "duplicate") rows.push(["Existing palm ID", r.existing]);
+  if (p) rows.push(["Screen/print check", `${p.recapture} (limit ${p.threshold}) – ${p.flagged ? (p.mode === "enforce" ? "rejected" : "flagged, warn only") : "live"}`]);
+  if (t.templates_ms != null) rows.push(["Template creation", `${t.templates_ms} ms`]);
+  if (t.search_ms != null) rows.push(["Protected search", `${t.search_ms} ms`]);
+  if (t.match_ms != null) rows.push(["Matcher", `${t.match_ms} ms (${t.comparisons} comparison${t.comparisons === 1 ? "" : "s"})`]);
+  if (t.total_ms != null) rows.push(["Total after capture", `${t.total_ms} ms`]);
+  const title = { registered: "Palm registered", identified: "Payment approved", duplicate: "Already registered",
+    unknown: "Palm not recognised", liveness: "Liveness check failed", spoof: "Possible spoof", timeout: "Timed out", capture: "No clear photo" }[r.kind] || "Not completed";
+  const pid = r.kind === "registered" || r.kind === "identified" ? r.id : r.kind === "duplicate" ? r.existing : "";
+  $("result").className = "card result " + (ok ? "ok" : "bad");
+  $("result").innerHTML = `<div class="icon">${ok ? "✓" : "!"}</div><h2>${title}</h2>
+    ${pid ? `<div class="pid">${pid}</div>` : ""}
+    ${r.kind === "identified" ? `<div>₹${$("amount").value || 0} paid${r.name ? " · " + esc(r.name) : ""}</div>` : ""}
+    <p style="color:var(--ink-2)">${esc(r.message || "")}</p>
+    ${rows.length ? `<div class="kv">${rows.map(([k, v]) => `<span>${k}</span><b>${esc(String(v))}</b>`).join("")}</div>` : ""}
+    <div class="actions"><button class="btn primary" onclick="show('home')">Done</button>
+    <button class="btn" onclick="start('${mode}')">${ok ? "Again" : "Try again"}</button></div>`;
+  show("result");
+}
+function esc(s) { return s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+// ------------------------------------------------------------------ admin
+function kb(n) { return n >= 1024 ? `${(n / 1024).toFixed(1)} KB` : `${n} B`; }
+function renderAdmin() {
+  if (!state) return;
+  $("people").innerHTML = state.people.map(p => `<tr><td><b>${p.id}</b></td><td>${esc(p.name || "–")}</td><td>${p.created}</td>
+    <td class="num">${p.photos}</td><td class="num">${kb(p.template_bytes)}</td><td class="num">${kb(p.search_bytes)}</td>
+    <td><button class="btn small danger" onclick="del('${p.id}')">Delete</button></td></tr>`).join("");
+  $("people-empty").classList.toggle("hidden", state.people.length > 0);
+  const cls = o => /registered|identified|deleted/.test(o) ? "good" : /duplicate|timeout/.test(o) ? "warn" : "bad";
+  $("audit").innerHTML = state.audit.map(a => `<tr><td>${a.time.replace("T", " ")}</td><td>${a.action}</td>
+    <td><span class="pill ${cls(a.outcome || "")}">${esc(a.outcome || "")}</span>${a.reason ? `<div class="sub" style="color:var(--ink-3)">${esc(a.reason)}</div>` : ""}</td>
+    <td>${a.id || a.existing || "–"}</td><td class="num">${a.score ?? a.best ?? "–"}</td><td class="num">${a.recapture ?? "–"}</td>
+    <td class="num">${a.total_ms ?? "–"}</td></tr>`).join("");
+  $("audit-empty").classList.toggle("hidden", state.audit.length > 0);
+  const c = state.config;
+  $("config").innerHTML = [["Matcher", `v4: v3c keypoints${c.fusion ? " + v2 fusion" : ""}, preprocessing ${c.preprocess}`],
+    ["Decision threshold", c.threshold], ["Search", `protected HOL vector (IoM ${c.iom}), top ${c.shortlist} re-checked by the matcher`],
+    ["Screen/print check", `limit ${c.recapture_threshold}, ${c.pad === "enforce" ? "enforced" : "warn only"}`],
+    ["Liveness", "random finger counts at random times, checked on the server"], ["Device", c.device]]
+    .map(([k, v]) => `<span>${k}</span><b>${esc(String(v))}</b>`).join("");
+  $("lock-pill").textContent = state.locked ? `locked for ${state.locked} s after failed attempts` : "";
+  $("lock-pill").className = state.locked ? "pill bad" : "hidden";
+}
+async function del(id) {
+  if (!confirm(`Delete ${id}? Its templates and search template are erased. This cannot be undone.`)) return;
+  const r = await post("/api/kiosk/delete", { id }); state = r; refresh();
+}
+
+$("go-register").onclick = () => start("register");
+$("go-pay").onclick = () => start("pay");
+$("cancel").onclick = () => { stop(); show("home"); };
+$("nav-kiosk").onclick = () => { $("nav-kiosk").className = "on"; $("nav-admin").className = ""; if (!running) show("home"); };
+$("nav-admin").onclick = () => { $("nav-admin").className = "on"; $("nav-kiosk").className = ""; stop(); refresh(); show("admin"); };
+refresh();
+</script>
+</body>
+</html>

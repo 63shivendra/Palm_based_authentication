@@ -1,0 +1,57 @@
+[
+  {
+    "dataset": "bjtu2",
+    "method": "v3c",
+    "enrol": 1,
+    "protocol": "cross-session",
+    "images": 160,
+    "usable": 160,
+    "identities": 40,
+    "test_identities": 32,
+    "dev_identities": 8,
+    "detect": false,
+    "fte_rate": 0.0,
+    "fte_reasons": {},
+    "threshold": 12.0,
+    "accuracy": 0.9363057324840764,
+    "FMR": 0.0,
+    "FNMR": 0.3125,
+    "FAR": 0.0,
+    "FRR": 0.3125,
+    "EER": 0.13840625,
+    "EER_threshold": 0.28125,
+    "TAR_at_FAR_1e2": 0.765625,
+    "TAR_at_FAR_1e3": null,
+    "TAR_at_FAR_1e4": null,
+    "AUC": 0.9296718750000001,
+    "dprime": 1.3581646134775145,
+    "genuine_median": 51.1328125,
+    "genuine_min": 0.0,
+    "impostor_median": 0.0,
+    "impostor_max": 3.5,
+    "genuine_comparisons": 128,
+    "impostor_comparisons": 500,
+    "at_dev_eer": {
+      "threshold": 0.515625,
+      "FAR": 0.062,
+      "FRR": 0.171875,
+      "accuracy": 0.9156050955414012
+    },
+    "at_dev_far": {
+      "threshold": 7.515625,
+      "FAR": 0.0,
+      "FRR": 0.3046875,
+      "accuracy": 0.9378980891719745
+    },
+    "dev": {
+      "eer_threshold": 0.515625,
+      "far_threshold": 7.515625,
+      "genuine": 32,
+      "impostor": 125,
+      "EER": 0.059250000000000025
+    },
+    "rank1": null,
+    "rank1_probes": 0,
+    "seconds": 193.1
+  }
+]

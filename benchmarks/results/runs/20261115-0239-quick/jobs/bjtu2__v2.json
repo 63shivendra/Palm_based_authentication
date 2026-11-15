@@ -1,0 +1,57 @@
+[
+  {
+    "dataset": "bjtu2",
+    "method": "v2",
+    "enrol": 1,
+    "protocol": "cross-session",
+    "images": 160,
+    "usable": 160,
+    "identities": 40,
+    "test_identities": 32,
+    "dev_identities": 8,
+    "detect": false,
+    "fte_rate": 0.0,
+    "fte_reasons": {},
+    "threshold": 4.0,
+    "accuracy": 0.9490445859872612,
+    "FMR": 0.0,
+    "FNMR": 0.25,
+    "FAR": 0.0,
+    "FRR": 0.25,
+    "EER": 0.127,
+    "EER_threshold": 3.0,
+    "TAR_at_FAR_1e2": 0.75,
+    "TAR_at_FAR_1e3": null,
+    "TAR_at_FAR_1e4": null,
+    "AUC": 0.8745,
+    "dprime": 0.987878999168188,
+    "genuine_median": 14.0,
+    "genuine_min": 0.0,
+    "impostor_median": 0.0,
+    "impostor_max": 3.0,
+    "genuine_comparisons": 128,
+    "impostor_comparisons": 500,
+    "at_dev_eer": {
+      "threshold": 4.0,
+      "FAR": 0.0,
+      "FRR": 0.25,
+      "accuracy": 0.9490445859872612
+    },
+    "at_dev_far": {
+      "threshold": 4.0,
+      "FAR": 0.0,
+      "FRR": 0.25,
+      "accuracy": 0.9490445859872612
+    },
+    "dev": {
+      "eer_threshold": 4.0,
+      "far_threshold": 4.0,
+      "genuine": 32,
+      "impostor": 125,
+      "EER": 0.078125
+    },
+    "rank1": null,
+    "rank1_probes": 0,
+    "seconds": 19.6
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "dataset": "bjtu2",
+    "method": "v1",
+    "enrol": 1,
+    "protocol": "cross-session",
+    "images": 160,
+    "usable": 160,
+    "identities": 40,
+    "test_identities": 32,
+    "dev_identities": 8,
+    "detect": false,
+    "fte_rate": 0.0,
+    "fte_reasons": {},
+    "threshold": -0.3,
+    "accuracy": 0.7993630573248407,
+    "FMR": 0.0,
+    "FNMR": 0.984375,
+    "FAR": 0.0,
+    "FRR": 0.984375,
+    "EER": 0.11559375,
+    "EER_threshold": -0.7046737500881951,
+    "TAR_at_FAR_1e2": 0.765625,
+    "TAR_at_FAR_1e3": null,
+    "TAR_at_FAR_1e4": null,
+    "AUC": 0.9494687500000001,
+    "dprime": 2.054896428918836,
+    "genuine_median": -0.5712892053640426,
+    "genuine_min": -0.7842408363575566,
+    "impostor_median": -0.7484104849560833,
+    "impostor_max": -0.6025497300823657,
+    "genuine_comparisons": 128,
+    "impostor_comparisons": 500,
+    "at_dev_eer": {
+      "threshold": -0.6525973361897754,
+      "FAR": 0.006,
+      "FRR": 0.2578125,
+      "accuracy": 0.9426751592356688
+    },
+    "at_dev_far": {
+      "threshold": -0.6034291184690321,
+      "FAR": 0.002,
+      "FRR": 0.4140625,
+      "accuracy": 0.9140127388535032
+    },
+    "dev": {
+      "eer_threshold": -0.6525973361897754,
+      "far_threshold": -0.6034291184690321,
+      "genuine": 32,
+      "impostor": 125,
+      "EER": 0.05525000000000002
+    },
+    "rank1": null,
+    "rank1_probes": 0,
+    "seconds": 32.0
+  }
+]

@@ -1,0 +1,9 @@
+where,device,stage,median_ms,p95_ms,n
+this_device,CPU (16 threads),detect,74.5,3905.5,5
+this_device,CPU (16 threads),align,2.5,29.1,5
+this_device,CPU (16 threads),extract_v3,1344.5,1374.9,5
+this_device,CPU (16 threads),extract_v3c,1360.5,1399.2,5
+this_device,CPU (16 threads),extract_v3cr,1322.7,1394.1,5
+this_device,CPU (16 threads),match_v3,1040.9,1442.2,4
+this_device,CPU (16 threads),match_v3c,434.1,565.3,4
+this_device,CPU (16 threads),match_v3cr,437.5,557.7,4

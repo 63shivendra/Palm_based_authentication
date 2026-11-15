@@ -1,0 +1,14 @@
+Lighting conditions, Tongji DEV identities (40), threshold 12, from the run of 2026-11-15 01:35 (its table writer failed after this stage; see dev_tuning.md for the rest).
+Gate = palm_quality.py limits at that time (before benchmarks/gate_dev.py set them).
+lighting · raw        clean                          FNMR 0.00%  FMR 0.00%  gate rejects 0.00%  FNMR of photos passing the gate 0.00%
+lighting · raw        brighter (x1.5)                FNMR 5.00%  FMR 0.00%  gate rejects 42.50%  FNMR of photos passing the gate 0.00%
+lighting · raw        overexposed (x2.0, clipped)    FNMR 50.00%  FMR 0.00%  gate rejects 87.50%  FNMR of photos passing the gate 0.00%
+lighting · raw        hard shadow (half palm x0.4)   FNMR 5.00%  FMR 0.00%  gate rejects 0.00%  FNMR of photos passing the gate 5.00%
+lighting · raw        gamma 2.0 (dim)                FNMR 0.00%  FMR 0.00%  gate rejects 7.50%  FNMR of photos passing the gate 0.00%
+lighting · raw        sensor noise (sigma 12)        FNMR 65.00%  FMR 0.00%  gate rejects 100.00%  FNMR of photos passing the gate n/a
+lighting · clahe      clean                          FNMR 0.00%  FMR 0.00%  gate rejects 0.00%  FNMR of photos passing the gate 0.00%
+lighting · clahe      brighter (x1.5)                FNMR 7.50%  FMR 0.00%  gate rejects 42.50%  FNMR of photos passing the gate 0.00%
+lighting · clahe      overexposed (x2.0, clipped)    FNMR 60.00%  FMR 0.00%  gate rejects 87.50%  FNMR of photos passing the gate 0.00%
+lighting · clahe      hard shadow (half palm x0.4)   FNMR 0.00%  FMR 0.00%  gate rejects 0.00%  FNMR of photos passing the gate 0.00%
+lighting · clahe      gamma 2.0 (dim)                FNMR 0.00%  FMR 0.00%  gate rejects 7.50%  FNMR of photos passing the gate 0.00%
+lighting · clahe      sensor noise (sigma 12)        FNMR 87.50%  FMR 0.00%  gate rejects 100.00%  FNMR of photos passing the gate n/a

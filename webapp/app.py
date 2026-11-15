@@ -13,6 +13,7 @@ and the dashboard shows their decisions, scores and timings side by side:
   v3    palm_match.py           full template (2,048 keypoints)
   v3c   palm_match_compact.py   compact template (1,024 keypoints, 1 byte per value)
   v3cr  palm_match_robust.py    v3c + noise-adaptive smoothing + retry on failure
+  v4    palm_engine.py          CLAHE + v3c / SIFT score fusion, settings chosen on DEV identities
 
 Only templates are stored, in webapp/data/ (git-ignored). Photos are never written to disk.
 There is NO spoof detection: a photo of a palm can be accepted.
@@ -38,6 +39,7 @@ sys.path.insert(0, ROOT)
 import palm_match as pm  # noqa: E402
 import palm_match_compact as pmc  # noqa: E402
 import palm_match_robust as pmr  # noqa: E402
+import palm_engine as eng  # noqa: E402
 
 DATA = os.path.join(HERE, "data")
 USERS_DIR = os.path.join(DATA, "users")
@@ -49,6 +51,7 @@ MODELS = [
     dict(key="v3", name="v3", detail="Full template, 2,048 keypoints", threshold=float(pm.V3_THRESHOLD)),
     dict(key="v3c", name="v3c", detail="Compact template, 1,024 keypoints", threshold=float(pmc.THRESHOLD)),
     dict(key="v3cr", name="v3cr", detail="v3c + noise smoothing and retry", threshold=float(pmr.THRESHOLD)),
+    dict(key="v4", name="v4", detail="CLAHE + v3c/SIFT score fusion (DEV-tuned)", threshold=float(eng.V4["threshold"])),
 ]
 THRESHOLD = {m["key"]: m["threshold"] for m in MODELS}
 ATTEMPT = ["first attempt", "smoothed retry"] + [f"retry rotated {a:+d}°" for a in pmr.RETRY_ANGLES]
@@ -76,6 +79,11 @@ def save_user(s):
     pm.save_templates_v3(os.path.join(d, "v3.npz"), u["tpl"]["v3"])
     pmc.save_templates(os.path.join(d, "v3c.npz"), u["tpl"]["v3c"])
     pmc.save_templates(os.path.join(d, "v3cr.npz"), u["tpl"]["v3cr"])
+    v4 = {}
+    for j, t in enumerate(u["tpl"]["v4"]):
+        v4[f"kp{j}"], v4[f"des{j}"] = t["v3c"]
+        v4[f"v2kp{j}"], v4[f"v2des{j}"] = t["v2"]
+    np.savez_compressed(os.path.join(d, "v4.npz"), method=np.array("v4"), **v4)
     u["bytes"] = {m["key"]: os.path.getsize(os.path.join(d, m["key"] + ".npz")) for m in MODELS}
     with open(os.path.join(d, "meta.json"), "w", encoding="utf-8") as f:
         json.dump(dict(name=u["name"], created=u["created"]), f)
@@ -90,9 +98,14 @@ def load_users():
             meta = json.load(open(os.path.join(d, "meta.json"), encoding="utf-8"))
             tpl = {"v3": pm.load_any_templates(os.path.join(d, "v3.npz"))[1],
                    "v3c": pmc.load_templates(os.path.join(d, "v3c.npz")),
-                   "v3cr": pmc.load_templates(os.path.join(d, "v3cr.npz"))}
+                   "v3cr": pmc.load_templates(os.path.join(d, "v3cr.npz")), "v4": []}
+            p4 = os.path.join(d, "v4.npz")
+            if os.path.exists(p4):
+                z = np.load(p4)
+                tpl["v4"] = [dict(v3c=(z[f"kp{j}"], z[f"des{j}"]), v2=(z[f"v2kp{j}"], z[f"v2des{j}"]))
+                             for j in range(sum(1 for k in z.files if k.startswith("kp")))]
             USERS[s] = dict(meta, tpl=tpl, bytes={m["key"]: os.path.getsize(os.path.join(d, m["key"] + ".npz"))
-                                                  for m in MODELS})
+                                                  for m in MODELS if os.path.exists(os.path.join(d, m["key"] + ".npz"))})
         except Exception as e:  # a half-written folder must not stop the app
             print(f"skipping {d}: {e}", file=sys.stderr)
 
@@ -194,6 +207,13 @@ def run_models(crop, claimed):
         return best_of([pmr.match(t, retries["probe"]) for t in USERS[s]["tpl"]["v3cr"]])
 
     timed("v3cr", lambda: pmc.features(pmr.condition(crop)), robust)
+
+    def v4(probe, s):                              # people enrolled before v4 existed have no v4 template
+        if not USERS[s]["tpl"]["v4"]:
+            return dict(score=0.0, inliers=0, cells=0, photo=0)
+        return best_of([dict(score=eng.score(t, probe), inliers=0, cells=0) for t in USERS[s]["tpl"]["v4"]])
+
+    timed("v4", lambda: eng.make_template(crop), v4)
     others = [dict(id=s, name=USERS[s]["name"], claimed=s == claimed, scores=scores[s]) for s in order]
     return out, others
 
@@ -236,7 +256,8 @@ def api_enroll():
             bgr, source = read_photo()
             t = time.perf_counter()
             crop, info = palm_crop(bgr)
-            tpl = {"v3": pm.features_v3(crop), "v3c": pmc.features(crop), "v3cr": pmr.template_of_crop(crop)}
+            tpl = {"v3": pm.features_v3(crop), "v3c": pmc.features(crop), "v3cr": pmr.template_of_crop(crop),
+                   "v4": eng.make_template(crop)}
         except pm.QualityError as e:
             log(dict(action="enrol", person=name, rejected=str(e)))
             return jsonify(ok=False, rejected=True, error=str(e), state=state())

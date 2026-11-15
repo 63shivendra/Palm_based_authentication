@@ -1,0 +1,57 @@
+[
+  {
+    "dataset": "tongji",
+    "method": "v2",
+    "enrol": 1,
+    "protocol": "cross-session",
+    "images": 160,
+    "usable": 160,
+    "identities": 40,
+    "test_identities": 32,
+    "dev_identities": 8,
+    "detect": false,
+    "fte_rate": 0.0,
+    "fte_reasons": {},
+    "threshold": 4.0,
+    "accuracy": 1.0,
+    "FMR": 0.0,
+    "FNMR": 0.0,
+    "FAR": 0.0,
+    "FRR": 0.0,
+    "EER": 0.0,
+    "EER_threshold": 3.5,
+    "TAR_at_FAR_1e2": 1.0,
+    "TAR_at_FAR_1e3": null,
+    "TAR_at_FAR_1e4": null,
+    "AUC": 1.0,
+    "dprime": 2.1349291567055535,
+    "genuine_median": 58.5,
+    "genuine_min": 4.0,
+    "impostor_median": 0.0,
+    "impostor_max": 3.0,
+    "genuine_comparisons": 128,
+    "impostor_comparisons": 500,
+    "at_dev_eer": {
+      "threshold": 15.0,
+      "FAR": 0.0,
+      "FRR": 0.0390625,
+      "accuracy": 0.9920382165605095
+    },
+    "at_dev_far": {
+      "threshold": 30.0,
+      "FAR": 0.0,
+      "FRR": 0.15625,
+      "accuracy": 0.9681528662420382
+    },
+    "dev": {
+      "eer_threshold": 15.0,
+      "far_threshold": 30.0,
+      "genuine": 32,
+      "impostor": 125,
+      "EER": 0.0
+    },
+    "rank1": null,
+    "rank1_probes": 0,
+    "seconds": 24.2
+  }
+]
