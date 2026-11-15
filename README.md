@@ -104,28 +104,34 @@ reports real APCER / BPCER.
 
 ---
 
-## Palm payment kiosk (register, then pay with your palm)
+## Palm payment kiosk: end-to-end system (simulated payments)
 
 ```
-.\bench.ps1 kiosk                       # http://127.0.0.1:5060   (or: python webapp/kiosk.py)
-.\bench.ps1 kiosk --pad enforce         # also reject photos the screen/print check flags
+.ench.ps1 kiosk                              # http://127.0.0.1:5060   (or: python webapp/kiosk.py)
+.ench.ps1 kiosk --https --host 0.0.0.0       # from a phone on the same Wi-Fi: https://<this-pc>:5060
+.ench.ps1 kiosk --pad enforce                # also reject photos the screen/print check flags
+.ench.ps1 kiosk --step-up 1000               # ask for the PIN above Rs 1,000 (default 2,000)
 ```
 
-1. **Register**: show the open palm; the screen gives live instructions (closer, too bright, open your hand, ...) until
-   the photo is usable. Then a liveness check asks for random finger counts at random times, ending with the open hand.
-   Three open-hand frames are captured. A duplicate search runs over everyone registered; a new palm gets the next free
-   ID (`PALM-0001`, `PALM-0002`, ...), an optional name is for the admin only.
-2. **Pay**: the same capture and liveness check, then a 1:N search: the protected palm vector picks the 3 most similar
-   registered palms and the matcher decides. The result shows the palm ID, the score and the time of every stage.
-3. **Admin**: registered palm IDs (no images), template sizes, delete (erases everything stored for that person), audit
-   log with CSV export.
+| Screen | What happens |
+|---|---|
+| **Register** | name, demo UPI ID, opening balance of a demo wallet, optional 4-6 digit PIN, DPDP-style consent (purpose, what is stored, how to erase). Then live capture guidance, random finger-count liveness, 3 photos, duplicate search over everyone registered, and the next free palm ID (`PALM-0001`, ...) |
+| **Pay** | the merchant enters the amount; the customer only shows the palm. Liveness, 1:N search (protected vector shortlist, then the v4 matcher), then the payment rules: PIN step-up above Rs 2,000 (3 tries), at most Rs 10,000 per payment and Rs 5,000 per day, enough balance. Receipt with transaction ID, masked UPI ID, authentication method, timings and the simulated payment message |
+| **My account** | show the palm to see balance, daily spend and recent payments, or erase everything stored for that palm (right to erasure) |
+| **Admin** (`#admin`) | admin PIN set on first start (PBKDF2 hash), 30-minute sessions, 5 wrong PINs lock it for 5 minutes. Last-24-hours figures (identification rate, approvals, declines, liveness failures, duplicates blocked, spoof flags, median time), registered palms with balances, demo top-up, delete, transactions, audit log, CSV exports |
 
-Every check runs on the server, not in the browser. Photos are never written to disk. Stored per person in
-`webapp/data/kiosk/` (git-ignored): the keypoint templates encrypted with Windows DPAPI, and 3 x 512 bytes of cancellable
-IoM search hashes. Three failed liveness attempts within 2 minutes lock the kiosk for 60 seconds.
+Every check runs on the server, not in the browser; photos are never written to disk. Stored in `webapp/data/kiosk/`
+(git-ignored): `palmpay.db` (SQLite: people, demo wallets, transactions, audit log, PIN hashes), per person the keypoint
+templates encrypted with Windows DPAPI, and 3 x 512 bytes of cancellable IoM search hashes. Three failed liveness or PIN
+attempts within 2 minutes lock the kiosk for 60 seconds.
+
+**Payments are simulated.** Wallets and balances are demo values; each transaction carries a pacs.008-shaped payment
+message marked `Simulated` with an HMAC-SHA256 integrity tag from a local key. Nothing is sent to a bank, NPCI or UPI.
 
 The passive screen/print check defaults to warn-only: its threshold was set on photos from other cameras, so check it on
-the kiosk camera first (`python scripts/capture_pad_set.py`, then `.\bench.ps1 pad`).
+the kiosk camera first (`python scripts/capture_pad_set.py`, then `.ench.ps1 pad`). End-to-end tests:
+`tests/test_kiosk.py` (registration, duplicate block, palm-only and PIN payments, limits, unknown palm, account view,
+erasure, admin).
 
 ---
 
@@ -213,7 +219,7 @@ research code with unit tests. **None of their performance figures (accuracy, la
 |-- palm_pad.py              # spoof checks: passive screen/print check, active finger-count liveness
 |-- palm_embed.py            # fixed-length palm vector (HOL) for 1:N search
 |-- palm_protect.py          # cancellable IoM search template, encrypted keypoint templates
-|-- webapp/                  # kiosk.py (register / pay / admin) and app.py (side-by-side matcher dashboard)
+|-- webapp/                  # kiosk.py + palmpay_db.py (register / pay / account / admin, SQLite) and app.py (matcher dashboard)
 |-- benchmarks/              # benchmark runner and report; DEV tuning, spoof, search and speed evaluations; results
 |-- scripts/                 # dataset download, spoof test-set capture, debugging scripts
 |-- bench.ps1                # launcher: fetch, run, report, tune, pad, embed, speed, kiosk, test
