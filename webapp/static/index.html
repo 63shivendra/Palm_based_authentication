@@ -11,7 +11,7 @@
   --line: #e1e0d9; --track: #ecebe6; --accent: #1f5fb0; --accent-ink: #ffffff;
   --good: #0ca30c; --good-ink: #006300; --good-wash: #e6f5e6; --bad: #d03b3b; --bad-ink: #a32222; --bad-wash: #fbe9e9;
   --warn-wash: #fff4d6; --warn-ink: #6b4a00;
-  --v3: #2a78d6; --v3c: #eb6834; --v3cr: #1baf7a; --v5: #6250d6;
+  --v3: #2a78d6; --v3c: #eb6834; --v3cr: #1baf7a; --v4: #7356c9; --v5: #e87ba4;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -19,7 +19,7 @@
     --line: #2c2c2a; --track: #2c2c2a; --accent: #3987e5; --accent-ink: #0b0b0b;
     --good: #0ca30c; --good-ink: #5ed05e; --good-wash: #12301a; --bad: #e66767; --bad-ink: #f09a9a; --bad-wash: #3a1818;
     --warn-wash: #3a2f10; --warn-ink: #f2d27a;
-    --v3: #3987e5; --v3c: #d95926; --v3cr: #199e70; --v5: #9085e9;
+    --v3: #3987e5; --v3c: #d95926; --v3cr: #199e70; --v4: #a08cf0; --v5: #d55181;
   }
 }
 * { box-sizing: border-box; }
@@ -38,7 +38,7 @@ header .sub { color: var(--ink2); font-size: 13.5px; }
 .rows { margin-top: 6px; display: grid; gap: 3px; font-size: 13.5px; }
 .rows div { display: flex; justify-content: space-between; gap: 8px; }
 .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; }
-.dot.v3 { background: var(--v3); } .dot.v3c { background: var(--v3c); } .dot.v3cr { background: var(--v3cr); } .dot.v5 { background: var(--v5); }
+.dot.v3 { background: var(--v3); } .dot.v3c { background: var(--v3c); } .dot.v3cr { background: var(--v3cr); } .dot.v4 { background: var(--v4); } .dot.v5 { background: var(--v5); }
 .main { display: grid; grid-template-columns: minmax(300px, 400px) minmax(0, 1fr); gap: 16px; align-items: start; }
 .seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--track); border-radius: 9px; padding: 3px; margin-bottom: 12px; }
 .seg button { border: 0; background: transparent; color: var(--ink2); padding: 7px; border-radius: 7px; font: inherit; cursor: pointer; }
@@ -192,9 +192,9 @@ function renderTiles() {
     <div class="card tile"><div class="label">Verifications</div><div class="value">${v.length}</div>
       <div class="note">${rej} photo${rej === 1 ? '' : 's'} rejected for quality</div></div>
     <div class="card tile"><div class="label">Said “match”</div>
-      <div class="rows">${rows(m => v.length ? `${v.filter(h => h.results[m.key].match).length} of ${v.length}` : '–')}</div></div>
+      <div class="rows">${rows(m => v.length ? `${v.filter(h => h.results[m.key] && h.results[m.key].match).length} of ${v.filter(h => h.results[m.key]).length}` : '–')}</div></div>
     <div class="card tile"><div class="label">Median time per photo</div>
-      <div class="rows">${rows(m => v.length ? fmt(Math.round(median(v.map(h => h.results[m.key].ms)))) + ' ms' : '–')}</div></div>`;
+      <div class="rows">${rows(m => v.length ? (v.some(h => h.results[m.key]) ? fmt(Math.round(median(v.filter(h => h.results[m.key]).map(h => h.results[m.key].ms)))) + ' ms' : '–') : '–')}</div></div>`;
 }
 
 function renderPeople() {
@@ -205,7 +205,7 @@ function renderPeople() {
   if (!S.users.length) { $('#people').innerHTML = '<div class="empty">Nobody enrolled yet.</div>'; return; }
   $('#people').innerHTML = `<table><thead><tr><th>Name</th><th class="num">Photos</th><th class="num">Template size per photo</th><th></th></tr></thead><tbody>` +
     S.users.map(u => `<tr><td>${esc(u.name)}<div class="since">since ${esc(u.created)}</div></td><td class="num">${u.photos} of ${S.max_photos}</td>
-      <td class="num">${S.models.map(m => `<div><span class="dot ${m.key}"></span>${m.name} ${kb(u.bytes[m.key] / u.photos)}</div>`).join('')}</td>
+      <td class="num">${S.models.map(m => `<div><span class="dot ${m.key}"></span>${m.name} ${u.bytes[m.key] ? kb(u.bytes[m.key] / u.photos) : '–'}</div>`).join('')}</td>
       <td><button class="link" data-del="${esc(u.id)}" data-name="${esc(u.name)}">Delete</button></td></tr>`).join('') + '</tbody></table>';
 }
 
@@ -255,10 +255,10 @@ function showVerify(j) {
       <div class="score">${fmt(r.score)} <small>score</small></div>
       <div class="meter" role="img" aria-label="score ${fmt(r.score)}, threshold ${r.threshold}"><i style="width:${w}%;background:${r.match ? 'var(--good)' : 'var(--muted)'}"></i><span class="tick"></span></div>
       <div class="meterlabel"><span>0</span><span>threshold ${r.threshold}</span><span>${fmt(4 * r.threshold)}+</span></div>
-      <div class="kv"><span>Matched points</span><b>${r.inliers}</b><span>Palm area covered</span><b>${r.cells} of 64 cells</b>
+      <div class="kv">${m.key === 'v4' ? `<span>Score</span><b>v3c / 12 + SIFT inliers / 4</b>` : `<span>Matched points</span><b>${r.inliers}</b><span>Palm area covered</span><b>${r.cells} of 64 cells</b>`}
         <span>Best enrolled photo</span><b>photo ${r.photo}</b>${m.key === 'v3cr' || m.key === 'v5' ? `<span>Decided on</span><b>${esc(r.attempt)}</b>` : ''}
         <span>Time (extract + match)</span><b>${r.extract_ms} + ${r.match_ms} ms</b>
-        <span>Template per photo</span><b>${person ? kb(person.bytes[m.key] / person.photos) : ''}</b></div></div>`;
+        <span>Template per photo</span><b>${person && person.bytes[m.key] ? kb(person.bytes[m.key] / person.photos) : ''}</b></div></div>`;
   }).join('');
   const others = j.others.length > 1 ? `<div class="section"><h2>Score against every enrolled person</h2><div class="tablewrap"><table><thead><tr><th>Person</th>${S.models.map(m => `<th class="num"><span class="dot ${m.key}"></span>${m.name} (≥ ${m.threshold})</th>`).join('')}</tr></thead><tbody>` +
     j.others.map(o => `<tr class="${o.claimed ? 'claimed' : ''}"><td>${esc(o.name)}${o.claimed ? ' (claimed)' : ''}</td>${S.models.map(m => { const s = o.scores[m.key], ok = s >= m.threshold; return `<td class="num"><span class="${ok ? 'yes-t' : ''}">${ok ? '✓ ' : ''}${fmt(s)}</span></td>`; }).join('')}</tr>`).join('') + '</tbody></table></div></div>' : '';

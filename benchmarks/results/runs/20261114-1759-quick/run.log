@@ -1,0 +1,71 @@
+2026-11-14 17:59:34 command: benchmarks\run_benchmark.py --profile quick
+2026-11-14 17:59:35 device: CPU (16 threads)  profile: quick
+2026-11-14 17:59:37 tongji: 160/160 photos usable, FTE 0.00% ; split 8 DEV / 32 TEST identities
+2026-11-14 18:01:16 tongji · v3c: DEV thresholds  EER-point 31.5  FAR0.1%-point 58.7
+2026-11-14 18:02:53 RESULT {"dataset": "tongji", "method": "v3c", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 18:08:32 tongji · v3cr: DEV thresholds  EER-point 31.5  FAR0.1%-point 58.7
+2026-11-14 18:10:11 RESULT {"dataset": "tongji", "method": "v3cr", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 18:10:17 tongji · v2: DEV thresholds  EER-point 9.0  FAR0.1%-point 15.0
+2026-11-14 18:10:21 RESULT {"dataset": "tongji", "method": "v2", "EER": 0.005906250000000002, "FAR": 0.0, "FRR": 0.0078125, "accuracy": 0.9984076433121019}
+2026-11-14 18:10:29 tongji · v1: DEV thresholds  EER-point -0.6  FAR0.1%-point -0.6
+2026-11-14 18:10:52 RESULT {"dataset": "tongji", "method": "v1", "EER": 0.031625000000000014, "FAR": 0.0, "FRR": 0.9140625, "accuracy": 0.8136942675159236}
+2026-11-14 18:11:02 rejected[/] IMG_20200309_120033_1 - Copy.png: photo too blurry
+2026-11-14 18:11:02 rejected[/] IMG_20200309_120042_9 - Copy.png: photo too blurry
+2026-11-14 18:11:02 rejected[/] IMG_20200309_120035_0 - Copy.png: photo too blurry
+2026-11-14 18:11:04 palmmatchdb: 112/115 photos usable, FTE 2.61% {'photo too blurry': 3}; split 0 DEV / 39 TEST identities
+2026-11-14 18:13:27 RESULT {"dataset": "palmmatchdb", "method": "v3c", "EER": 0.00990196078431373, "FAR": 0.0, "FRR": 0.05473145780051151, "accuracy": 0.9950166112956811}
+2026-11-14 18:18:48 RESULT {"dataset": "palmmatchdb", "method": "v3cr", "EER": 0.008901960784313729, "FAR": 0.0, "FRR": 0.05473145780051151, "accuracy": 0.986784140969163}
+2026-11-14 18:18:55 RESULT {"dataset": "palmmatchdb", "method": "v2", "EER": 0.007901960784313728, "FAR": 0.005843478260869566, "FRR": 0.035635123614663256, "accuracy": 0.9933554817275747}
+2026-11-14 18:18:58 palmmatchdb · v1: its own quality gate rejected 31 more photos[/]
+2026-11-14 18:19:19 RESULT {"dataset": "palmmatchdb", "method": "v1", "EER": 0.027513513513513527, "FAR": 0.0, "FRR": 0.5240893066980024, "accuracy": 0.9581881533101045}
+2026-11-14 18:19:25 11khands: 90/90 photos usable, FTE 0.00% ; split 0 DEV / 30 TEST identities
+2026-11-14 18:21:35 RESULT {"dataset": "11khands", "method": "v3c", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 18:26:02 RESULT {"dataset": "11khands", "method": "v3cr", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 18:26:17 RESULT {"dataset": "11khands", "method": "v2", "EER": 0.0, "FAR": 0.006, "FRR": 0.0, "accuracy": 0.9949152542372881}
+2026-11-14 18:26:40 RESULT {"dataset": "11khands", "method": "v1", "EER": 0.022111111111111123, "FAR": 0.0, "FRR": 0.3, "accuracy": 0.9542372881355932}
+2026-11-14 18:26:40 bjtu2: 160/160 photos usable, FTE 0.00% ; split 8 DEV / 32 TEST identities
+2026-11-14 18:28:23 bjtu2 · v3c: DEV thresholds  EER-point 0.5  FAR0.1%-point 7.5
+2026-11-14 18:29:54 RESULT {"dataset": "bjtu2", "method": "v3c", "EER": 0.13840625, "FAR": 0.0, "FRR": 0.3125, "accuracy": 0.9363057324840764}
+2026-11-14 18:35:55 bjtu2 · v3cr: DEV thresholds  EER-point 1.0  FAR0.1%-point 3.1
+2026-11-14 18:37:39 RESULT {"dataset": "bjtu2", "method": "v3cr", "EER": 0.1265, "FAR": 0.0, "FRR": 0.3046875, "accuracy": 0.8458498023715415}
+2026-11-14 18:37:46 bjtu2 · v2: DEV thresholds  EER-point 5.0  FAR0.1%-point 5.0
+2026-11-14 18:37:49 RESULT {"dataset": "bjtu2", "method": "v2", "EER": 0.0713125, "FAR": 0.0, "FRR": 0.140625, "accuracy": 0.9713375796178344}
+2026-11-14 18:37:58 bjtu2 · v1: DEV thresholds  EER-point -0.7  FAR0.1%-point -0.6
+2026-11-14 18:38:27 RESULT {"dataset": "bjtu2", "method": "v1", "EER": 0.07806249999999998, "FAR": 0.0, "FRR": 0.96875, "accuracy": 0.802547770700637}
+2026-11-14 18:38:27 xinhua: 90/90 photos usable, FTE 0.00% ; split 0 DEV / 30 TEST identities
+2026-11-14 18:40:34 RESULT {"dataset": "xinhua", "method": "v3c", "EER": 0.0010000000000000009, "FAR": 0.002, "FRR": 0.0, "accuracy": 0.9983050847457627}
+2026-11-14 18:44:57 RESULT {"dataset": "xinhua", "method": "v3cr", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 18:45:14 RESULT {"dataset": "xinhua", "method": "v2", "EER": 0.0010000000000000009, "FAR": 0.006, "FRR": 0.0, "accuracy": 0.9949152542372881}
+2026-11-14 18:45:39 RESULT {"dataset": "xinhua", "method": "v1", "EER": 0.011555555555555562, "FAR": 0.002, "FRR": 0.9111111111111111, "accuracy": 0.8593220338983051}
+2026-11-14 18:45:39 gabor: 60/60 photos usable, FTE 0.00% ; split 0 DEV / 15 TEST identities
+2026-11-14 18:48:03 RESULT {"dataset": "gabor", "method": "v3c", "EER": 0.010555555555555561, "FAR": 0.0, "FRR": 0.05555555555555555, "accuracy": 0.9915254237288136}
+2026-11-14 18:54:26 RESULT {"dataset": "gabor", "method": "v3cr", "EER": 0.0, "FAR": 0.0, "FRR": 0.044444444444444446, "accuracy": 0.9813953488372094}
+2026-11-14 18:54:36 RESULT {"dataset": "gabor", "method": "v2", "EER": 0.0, "FAR": 0.004, "FRR": 0.0, "accuracy": 0.9966101694915255}
+2026-11-14 18:55:23 RESULT {"dataset": "gabor", "method": "v1", "EER": 0.17988888888888893, "FAR": 0.0, "FRR": 0.8888888888888888, "accuracy": 0.864406779661017}
+2026-11-14 18:55:23 real: 4/4 photos usable, FTE 0.00% ; split 0 DEV / 2 TEST identities
+2026-11-14 18:55:24 RESULT {"dataset": "real", "method": "v3c", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 18:55:34 RESULT {"dataset": "real", "method": "v3cr", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 18:55:34 RESULT {"dataset": "real", "method": "v2", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 18:55:34 RESULT {"dataset": "real", "method": "v1", "EER": 0.33333333333333337, "FAR": 0.0, "FRR": 1.0, "accuracy": 0.5}
+2026-11-14 18:56:10 robustness v3c clean (baseline): FRR 0.00% FAR 0.00%
+2026-11-14 18:56:37 robustness v3c darker (x0.5): FRR 0.00% FAR 0.00%
+2026-11-14 18:57:02 robustness v3c brighter (x1.5): FRR 5.00% FAR 0.00%
+2026-11-14 18:57:29 robustness v3c uneven light (gradient): FRR 0.00% FAR 0.00%
+2026-11-14 18:57:49 robustness v3c overexposed (x2.0, clipped): FRR 50.00% FAR 0.00%
+2026-11-14 18:58:13 robustness v3c hard shadow (half palm x0.4): FRR 0.00% FAR 0.00%
+2026-11-14 18:58:40 robustness v3c blur (sigma 4): FRR 0.00% FAR 0.00%
+2026-11-14 18:59:06 robustness v3c rotation 20 deg: FRR 5.00% FAR 0.00%
+2026-11-14 18:59:32 robustness v3c sensor noise (sigma 12): FRR 55.00% FAR 0.00%
+2026-11-14 18:59:58 robustness v3c JPEG quality 20: FRR 5.00% FAR 0.00%
+2026-11-14 19:01:37 robustness v3cr clean (baseline): FRR 0.00% FAR 0.00%
+2026-11-14 19:03:08 robustness v3cr darker (x0.5): FRR 0.00% FAR 0.00%
+2026-11-14 19:05:11 robustness v3cr brighter (x1.5): FRR 5.00% FAR 0.00%
+2026-11-14 19:08:52 robustness v3cr uneven light (gradient): FRR 0.00% FAR 0.00%
+2026-11-14 19:11:50 robustness v3cr overexposed (x2.0, clipped): FRR 50.00% FAR 0.00%
+2026-11-14 19:15:22 robustness v3cr hard shadow (half palm x0.4): FRR 0.00% FAR 0.00%
+2026-11-14 19:16:52 robustness v3cr blur (sigma 4): FRR 0.00% FAR 0.00%
+2026-11-14 19:18:45 robustness v3cr rotation 20 deg: FRR 0.00% FAR 0.00%
+2026-11-14 19:21:44 robustness v3cr sensor noise (sigma 12): FRR 0.00% FAR 0.00%
+2026-11-14 19:25:54 robustness v3cr JPEG quality 20: FRR 0.00% FAR 0.00%
+2026-11-14 19:26:31 results.json written
+2026-11-14 19:26:32 findfont: Failed to find font weight semibold for DejaVu Sans, now using 700.

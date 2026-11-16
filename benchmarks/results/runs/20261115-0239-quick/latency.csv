@@ -1,0 +1,11 @@
+where,device,stage,median_ms,p95_ms,n
+this_device,CPU (16 threads),detect,63.1,64.2,5
+this_device,CPU (16 threads),align,2.2,26.5,5
+this_device,CPU (16 threads),extract_v4,1382.5,1417.0,5
+this_device,CPU (16 threads),extract_v3,1210.1,1257.5,5
+this_device,CPU (16 threads),extract_v3c,1202.9,1246.6,5
+this_device,CPU (16 threads),extract_v3cr,1256.4,1264.2,5
+this_device,CPU (16 threads),match_v4,589.3,643.2,4
+this_device,CPU (16 threads),match_v3,925.6,1242.3,4
+this_device,CPU (16 threads),match_v3c,409.8,552.3,4
+this_device,CPU (16 threads),match_v3cr,388.7,538.9,4

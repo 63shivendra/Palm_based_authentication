@@ -1,0 +1,57 @@
+[
+  {
+    "dataset": "xinhua",
+    "method": "v4",
+    "enrol": 1,
+    "protocol": "all-vs-all",
+    "images": 90,
+    "usable": 87,
+    "identities": 30,
+    "test_identities": 24,
+    "dev_identities": 6,
+    "detect": false,
+    "fte_rate": 0.03333333333333333,
+    "fte_reasons": {},
+    "threshold": 1.5,
+    "accuracy": 1.0,
+    "FMR": 0.0,
+    "FNMR": 0.0,
+    "FAR": 0.0,
+    "FRR": 0.03333333333333333,
+    "EER": 0.0,
+    "EER_threshold": 1.841796875,
+    "TAR_at_FAR_1e2": 1.0,
+    "TAR_at_FAR_1e3": null,
+    "TAR_at_FAR_1e4": null,
+    "AUC": 1.0,
+    "dprime": 5.048328390586562,
+    "genuine_median": 21.247395833333332,
+    "genuine_min": 3.30078125,
+    "impostor_median": 0.0,
+    "impostor_max": 0.3828125,
+    "genuine_comparisons": 67,
+    "impostor_comparisons": 500,
+    "at_dev_eer": {
+      "threshold": 5.01171875,
+      "FAR": 0.0,
+      "FRR": 0.04776119402985075,
+      "accuracy": 0.998236331569665
+    },
+    "at_dev_far": {
+      "threshold": 9.94921875,
+      "FAR": 0.0,
+      "FRR": 0.09104477611940298,
+      "accuracy": 0.9929453262786596
+    },
+    "dev": {
+      "eer_threshold": 5.01171875,
+      "far_threshold": 9.94921875,
+      "genuine": 18,
+      "impostor": 125,
+      "EER": 0.0
+    },
+    "rank1": null,
+    "rank1_probes": 0,
+    "seconds": 477.2
+  }
+]

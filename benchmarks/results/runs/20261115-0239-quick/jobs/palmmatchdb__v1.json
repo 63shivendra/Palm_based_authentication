@@ -1,0 +1,43 @@
+[
+  {
+    "dataset": "palmmatchdb",
+    "method": "v1",
+    "enrol": 1,
+    "protocol": "all-vs-all (trusted-label pairs)",
+    "images": 115,
+    "usable": 81,
+    "identities": 39,
+    "test_identities": 39,
+    "dev_identities": 0,
+    "detect": true,
+    "fte_rate": 0.2956521739130435,
+    "fte_reasons": {
+      "photo too blurry": 3
+    },
+    "threshold": -0.3,
+    "accuracy": 0.9581881533101045,
+    "FMR": 0.0,
+    "FNMR": 0.32432432432432434,
+    "FAR": 0.0,
+    "FRR": 0.5240893066980024,
+    "EER": 0.027513513513513527,
+    "EER_threshold": -0.6236035869445258,
+    "TAR_at_FAR_1e2": 0.972972972972973,
+    "TAR_at_FAR_1e3": null,
+    "TAR_at_FAR_1e4": null,
+    "AUC": 0.9984594594594594,
+    "dprime": 4.435087669097591,
+    "genuine_median": -0.23537140847674493,
+    "genuine_min": -0.639761910293156,
+    "impostor_median": -0.7574695563684091,
+    "impostor_max": -0.583365323096609,
+    "genuine_comparisons": 74,
+    "impostor_comparisons": 500,
+    "at_dev_eer": null,
+    "at_dev_far": null,
+    "dev": null,
+    "rank1": null,
+    "rank1_probes": 0,
+    "seconds": 51.5
+  }
+]

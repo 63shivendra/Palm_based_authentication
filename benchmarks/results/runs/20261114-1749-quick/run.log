@@ -1,0 +1,12 @@
+2026-11-14 17:49:40 command: benchmarks/run_benchmark.py --quick --datasets real gabor --methods v3c v2 v1 --max-genuine 30 --max-impostor 60 --no-robustness --no-cpu-latency
+2026-11-14 17:49:41 device: CPU (16 threads)  profile: quick
+2026-11-14 17:49:46 real: 4/4 photos usable, FTE 0.00% ; split 0 DEV / 2 TEST identities
+2026-11-14 17:49:55 RESULT {"dataset": "real", "method": "v3c", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 17:49:57 RESULT {"dataset": "real", "method": "v2", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 17:49:58 RESULT {"dataset": "real", "method": "v1", "EER": 0.33333333333333337, "FAR": 0.0, "FRR": 1.0, "accuracy": 0.5}
+2026-11-14 17:49:58 gabor: 60/60 photos usable, FTE 0.00% ; split 0 DEV / 15 TEST identities
+2026-11-14 17:53:40 RESULT {"dataset": "gabor", "method": "v3c", "EER": 0.0, "FAR": 0.0, "FRR": 0.06666666666666667, "accuracy": 0.9777777777777777}
+2026-11-14 17:53:55 RESULT {"dataset": "gabor", "method": "v2", "EER": 0.0, "FAR": 0.0, "FRR": 0.0, "accuracy": 1.0}
+2026-11-14 17:54:52 RESULT {"dataset": "gabor", "method": "v1", "EER": 0.16666666666666663, "FAR": 0.0, "FRR": 0.9666666666666667, "accuracy": 0.6777777777777778}
+2026-11-14 17:57:03 results.json written
+2026-11-14 17:57:04 findfont: Failed to find font weight semibold for DejaVu Sans, now using 700.

@@ -46,3 +46,6 @@ checkpoints/
 
 # web app: enrolled templates and history stay on this computer
 webapp/data/
+
+# benchmark-only CUDA torch + helpers (see benchmarks/run_benchmark.py)
+.bench_env/

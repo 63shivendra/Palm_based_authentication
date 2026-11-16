@@ -1,0 +1,222 @@
+[
+  {
+    "method": "v3c",
+    "condition": "clean (baseline)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 273.609375,
+    "impostor_max": 1.96875,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3c",
+    "condition": "darker (x0.5)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 247.25,
+    "impostor_max": 2.75,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3c",
+    "condition": "brighter (x1.5)",
+    "FRR": 0.05,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 211.734375,
+    "impostor_max": 1.640625,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3c",
+    "condition": "uneven light (gradient)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 244.6328125,
+    "impostor_max": 2.265625,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3c",
+    "condition": "overexposed (x2.0, clipped)",
+    "FRR": 0.5,
+    "FAR": 0.0,
+    "EER": 0.375,
+    "genuine_median": 32.0625,
+    "impostor_max": 2.515625,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3c",
+    "condition": "hard shadow (half palm x0.4)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 157.0703125,
+    "impostor_max": 0.8125,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3c",
+    "condition": "blur (sigma 4)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 204.34375,
+    "impostor_max": 1.4375,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3c",
+    "condition": "rotation 20 deg",
+    "FRR": 0.05,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 255.0234375,
+    "impostor_max": 2.578125,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3c",
+    "condition": "sensor noise (sigma 12)",
+    "FRR": 0.55,
+    "FAR": 0.0,
+    "EER": 0.10000000000000002,
+    "genuine_median": 1.375,
+    "impostor_max": 0.1875,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3c",
+    "condition": "JPEG quality 20",
+    "FRR": 0.05,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 205.9375,
+    "impostor_max": 0.875,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3cr",
+    "condition": "clean (baseline)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 273.609375,
+    "impostor_max": 3.5,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3cr",
+    "condition": "darker (x0.5)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 247.25,
+    "impostor_max": 2.75,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3cr",
+    "condition": "brighter (x1.5)",
+    "FRR": 0.05,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 211.734375,
+    "impostor_max": 5.0,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3cr",
+    "condition": "uneven light (gradient)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 244.6328125,
+    "impostor_max": 2.3333333333333335,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3cr",
+    "condition": "overexposed (x2.0, clipped)",
+    "FRR": 0.5,
+    "FAR": 0.0,
+    "EER": 0.40625,
+    "genuine_median": 32.109375,
+    "impostor_max": 2.515625,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3cr",
+    "condition": "hard shadow (half palm x0.4)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 157.0703125,
+    "impostor_max": 0.8854166666666666,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3cr",
+    "condition": "blur (sigma 4)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 204.34375,
+    "impostor_max": 1.4375,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3cr",
+    "condition": "rotation 20 deg",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 255.0234375,
+    "impostor_max": 2.578125,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3cr",
+    "condition": "sensor noise (sigma 12)",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 216.7734375,
+    "impostor_max": 2.3333333333333335,
+    "genuine": 20,
+    "impostor": 80
+  },
+  {
+    "method": "v3cr",
+    "condition": "JPEG quality 20",
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 205.9375,
+    "impostor_max": 1.0416666666666667,
+    "genuine": 20,
+    "impostor": 80
+  }
+]

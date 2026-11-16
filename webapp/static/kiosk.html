@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palm Pay Kiosk</title>
+<style>
+:root {
+  --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eef0f3; --ink: #15181d; --ink-2: #4a515c; --ink-3: #7a828e;
+  --line: #dfe2e7; --accent: #2a62d6; --accent-ink: #ffffff; --good: #16833f; --good-bg: #e6f4ea; --bad: #c0392b;
+  --bad-bg: #fbeae8; --warn: #9a6400; --warn-bg: #fdf2dc; --overlay: rgba(10, 14, 20, .55); --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115; --surface: #171a20; --surface-2: #1f232b; --ink: #eceef2; --ink-2: #b4bac4; --ink-3: #858c97;
+    --line: #2a2f38; --accent: #5b8cff; --accent-ink: #0b0d11; --good: #4cc27a; --good-bg: #13291c; --bad: #ff7a6b;
+    --bad-bg: #321613; --warn: #f0b552; --warn-bg: #2e2412; --overlay: rgba(0, 0, 0, .6);
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+header h1 { font-size: 17px; margin: 0; font-weight: 650; }
+header nav { display: flex; gap: 4px; margin-left: 8px; }
+header nav button { background: none; border: 0; padding: 7px 12px; border-radius: 8px; color: var(--ink-2); font: inherit; cursor: pointer; }
+header nav button.on { background: var(--surface-2); color: var(--ink); font-weight: 600; }
+.chips { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { font-size: 12.5px; padding: 4px 10px; border-radius: 99px; background: var(--surface-2); color: var(--ink-2); }
+.chip.sim { background: var(--warn-bg); color: var(--warn); }
+main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+.hidden { display: none !important; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+.card h2 { margin: 0 0 6px; font-size: 20px; }
+.card h3 { margin: 0 0 10px; font-size: 16px; }
+.card p { margin: 0 0 16px; color: var(--ink-2); }
+label { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 6px; }
+input[type=text], input[type=number], input[type=password] { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; margin-bottom: 14px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.wide { width: 100%; padding: 14px; font-size: 16px; }
+.btn.small { padding: 6px 10px; font-size: 13px; font-weight: 500; }
+.btn.danger { color: var(--bad); }
+.btn:disabled { opacity: .5; cursor: default; }
+.note { font-size: 13px; color: var(--ink-3); margin-top: 18px; }
+.consent { background: var(--surface-2); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; color: var(--ink-2); margin: 4px 0 14px; }
+.consent ul { margin: 6px 0 0; padding-left: 18px; }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--ink); margin-bottom: 16px; }
+.check input { margin-top: 3px; width: 18px; height: 18px; }
+.capture { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
+@media (max-width: 860px) { .capture { grid-template-columns: 1fr; } }
+.stage { position: relative; background: #000; border-radius: var(--radius); overflow: hidden; aspect-ratio: 16 / 9; }
+.stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.stage video { transform: scaleX(-1); }
+.prompt { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 20px; background: linear-gradient(transparent, var(--overlay) 35%); color: #fff; font-size: 26px; font-weight: 650; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+.prompt small { display: block; font-size: 14px; font-weight: 500; opacity: .85; margin-top: 2px; }
+.badge { position: absolute; top: 14px; left: 14px; padding: 5px 10px; border-radius: 99px; background: var(--overlay); color: #fff; font-size: 13px; }
+.side { display: flex; flex-direction: column; gap: 14px; }
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--ink-3); }
+.steps li:last-child { border-bottom: 0; }
+.steps li .dot { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.steps li.active { color: var(--ink); }
+.steps li.active .dot { border-color: var(--accent); color: var(--accent); }
+.steps li.done .dot { background: var(--good); border-color: var(--good); color: #fff; }
+.sub { font-size: 13px; color: var(--ink-3); }
+.pips { display: flex; gap: 5px; margin-top: 6px; }
+.pips span { width: 22px; height: 6px; border-radius: 3px; background: var(--line); }
+.pips span.on { background: var(--good); }
+.pips span.cur { background: var(--accent); }
+.readout { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; font-size: 13.5px; }
+.readout div span { display: block; color: var(--ink-3); font-size: 12px; }
+.readout b { font-variant-numeric: tabular-nums; font-weight: 600; }
+.meter { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 4px; }
+.meter i { display: block; height: 100%; background: var(--good); width: 0; transition: width .2s; }
+.issues { margin: 6px 0 0; padding-left: 18px; color: var(--warn); font-size: 13.5px; }
+.result { max-width: 640px; margin: 0 auto; text-align: center; }
+.result .icon { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; margin: 4px auto 14px; font-size: 38px; font-weight: 700; }
+.result.ok .icon { background: var(--good-bg); color: var(--good); }
+.result.bad .icon { background: var(--bad-bg); color: var(--bad); }
+.result h2 { font-size: 24px; margin: 0 0 4px; }
+.big { font-size: 34px; font-weight: 750; letter-spacing: .5px; margin: 8px 0; font-variant-numeric: tabular-nums; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; text-align: left; margin: 18px auto 0; max-width: 480px; font-size: 13.5px; }
+.kv span { color: var(--ink-3); }
+.kv b { font-weight: 600; font-variant-numeric: tabular-nums; word-break: break-word; }
+.actions { display: flex; gap: 10px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
+pre.msg { text-align: left; background: var(--surface-2); border-radius: 10px; padding: 12px; font-size: 12px; overflow-x: auto; margin-top: 14px; }
+.pinwrap { max-width: 360px; margin: 0 auto; text-align: center; }
+.pindots { display: flex; gap: 12px; justify-content: center; margin: 14px 0 18px; }
+.pindots span { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--ink-3); }
+.pindots span.on { background: var(--ink); border-color: var(--ink); }
+.pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pad button { padding: 16px 0; font-size: 22px; font-weight: 600; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--ink-3); font-weight: 600; font-size: 12.5px; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 99px; font-size: 12px; background: var(--surface-2); color: var(--ink-2); }
+.pill.good { background: var(--good-bg); color: var(--good); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.pill.warn { background: var(--warn-bg); color: var(--warn); }
+.admin { display: grid; gap: 18px; }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.head h2 { font-size: 17px; margin: 0; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.tile .l { font-size: 12.5px; color: var(--ink-3); }
+.tile .v { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.tile .n { font-size: 12px; color: var(--ink-3); }
+.scroll { overflow-x: auto; }
+.empty { color: var(--ink-3); padding: 16px 0; }
+.error { background: var(--bad-bg); color: var(--bad); padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; }
+.login { max-width: 380px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Palm Pay Kiosk</h1>
+  <nav><button id="nav-kiosk" class="on">Kiosk</button><button id="nav-admin">Admin</button></nav>
+  <div class="chips"><span class="chip sim">Simulated payments, demo wallets</span><span class="chip" id="chip-people">–</span><span class="chip" id="chip-device">–</span></div>
+</header>
+<main>
+  <div id="error" class="error hidden"></div>
+
+  <!-- home -->
+  <section id="view-home">
+    <div class="cards">
+      <div class="card">
+        <h2>Pay with your palm</h2>
+        <p id="pay-merchant">–</p>
+        <label for="amount">Amount (Rs)</label>
+        <input id="amount" type="number" min="1" step="1" value="120">
+        <button class="btn primary wide" id="go-pay">Pay</button>
+        <div class="note" id="pay-rules"></div>
+      </div>
+      <div class="card">
+        <h2>Register your palm</h2>
+        <p>Link your palm to a demo wallet in about 20 seconds. No card or phone needed at the counter afterwards.</p>
+        <button class="btn primary wide" id="go-register">Register</button>
+      </div>
+      <div class="card">
+        <h2>My account</h2>
+        <p>Show your palm to see your balance and recent payments, or to erase your palm data.</p>
+        <button class="btn wide" id="go-account">Open my account</button>
+      </div>
+    </div>
+    <p class="note">Photos are processed in memory and never saved. Every check (photo quality, liveness, matching) runs on
+      the kiosk server. Payments here are a simulation: nothing is sent to a bank, NPCI or UPI.</p>
+  </section>
+
+  <!-- registration form + consent -->
+  <section id="view-register" class="hidden">
+    <div class="card" style="max-width:640px;margin:0 auto">
+      <h2>Register your palm</h2>
+      <div class="row2">
+        <div><label for="r-name">Name (shown to you and the admin)</label><input id="r-name" type="text" maxlength="40" autocomplete="off"></div>
+        <div><label for="r-upi">UPI ID (demo)</label><input id="r-upi" type="text" placeholder="name@bank" autocomplete="off"></div>
+      </div>
+      <div class="row2">
+        <div><label for="r-balance">Opening balance, demo wallet (Rs)</label><input id="r-balance" type="number" min="0" max="100000" value="5000"></div>
+        <div><label for="r-pin">PIN for larger payments (4-6 digits, optional)</label><input id="r-pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div>
+      </div>
+      <div class="consent">
+        <b>Consent (Digital Personal Data Protection Act, 2023)</b>
+        <ul>
+          <li>Purpose: identify you for payments at this kiosk.</li>
+          <li>Stored: an encrypted palm template and a 512-byte cancellable search code, on this computer only. Your photos are not stored.</li>
+          <li>Not stored: images of your hand. The template is a set of encrypted palm-line features, not a picture; it is decrypted only in memory while matching.</li>
+          <li>You can erase everything at any time under "My account", or ask the admin.</li>
+        </ul>
+      </div>
+      <label class="check"><input type="checkbox" id="r-consent"> I agree that my palm template is stored for this purpose.</label>
+      <div class="actions" style="justify-content:flex-start;margin-top:0">
+        <button class="btn primary" id="r-start">Continue to palm capture</button><button class="btn" data-home>Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- capture -->
+  <section id="view-capture" class="hidden">
+    <div class="capture">
+      <div class="stage">
+        <video id="video" playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="badge" id="mode-badge">–</div>
+        <div class="prompt" id="prompt">Starting camera…<small id="prompt-sub"></small></div>
+      </div>
+      <div class="side">
+        <div class="card">
+          <ol class="steps">
+            <li id="st-position"><span class="dot">1</span><div>Position your palm<div class="sub">sharp, well lit, open</div></div></li>
+            <li id="st-liveness"><span class="dot">2</span><div>Liveness check<div class="sub">follow the finger prompts</div><div class="pips" id="pips"></div></div></li>
+            <li id="st-capture"><span class="dot">3</span><div>Capture<div class="sub" id="st-capture-sub">hold the open hand still</div></div></li>
+            <li id="st-process"><span class="dot">4</span><div id="st-process-label">Match</div></li>
+          </ol>
+        </div>
+        <div class="card">
+          <div class="readout">
+            <div><span>Fingers</span><b id="r-count">–</b></div>
+            <div><span>Finger spread</span><b id="r-spread">–</b></div>
+            <div><span>Photo quality</span><b id="r-quality">–</b><div class="meter"><i id="r-meter"></i></div></div>
+            <div><span>Server time / frame</span><b id="r-ms">–</b></div>
+          </div>
+          <ul class="issues" id="issues"></ul>
+        </div>
+        <button class="btn" id="cancel">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PIN step-up -->
+  <section id="view-pin" class="hidden">
+    <div class="card pinwrap">
+      <h2>Enter your PIN</h2>
+      <p id="pin-info">–</p>
+      <div class="pindots" id="pindots"></div>
+      <div class="pad" id="pinpad"></div>
+      <p class="sub" id="pin-msg" style="margin-top:12px"></p>
+    </div>
+  </section>
+
+  <!-- result / receipt -->
+  <section id="view-result" class="hidden"><div class="card result" id="result"></div></section>
+
+  <!-- my account -->
+  <section id="view-account" class="hidden"><div class="card" id="account" style="max-width:760px;margin:0 auto"></div></section>
+
+  <!-- admin -->
+  <section id="view-admin" class="hidden">
+    <div class="card login" id="admin-login">
+      <h2 id="admin-login-title">Admin login</h2>
+      <p class="sub" id="admin-login-note"></p>
+      <label for="admin-pin">Admin PIN</label><input id="admin-pin" type="password" inputmode="numeric" maxlength="8">
+      <div id="admin-pin2-wrap" class="hidden"><label for="admin-pin2">Repeat the PIN</label><input id="admin-pin2" type="password" inputmode="numeric" maxlength="8"></div>
+      <button class="btn primary wide" id="admin-go">Log in</button>
+    </div>
+    <div class="admin hidden" id="admin-panel">
+      <div class="head"><h2>Last 24 hours</h2><div><span class="pill" id="lock-pill"></span> <button class="btn small" id="admin-refresh">Refresh</button> <button class="btn small" id="admin-logout">Log out</button></div></div>
+      <div class="tiles" id="tiles"></div>
+      <div class="card">
+        <div class="head"><h2>Registered palms</h2></div>
+        <div class="scroll"><table><thead><tr><th>Palm ID</th><th>Name</th><th>UPI ID</th><th class="num">Balance</th><th class="num">Spent today / limit</th><th>PIN</th><th>Consent</th><th class="num">Templates</th><th></th></tr></thead><tbody id="people"></tbody></table></div>
+        <div class="empty hidden" id="people-empty">Nobody registered yet.</div>
+      </div>
+      <div class="card">
+        <div class="head"><h2>Transactions</h2><a class="btn small" id="exp-txn" href="#">Export CSV</a></div>
+        <div class="scroll"><table><thead><tr><th>Time</th><th>Transaction</th><th>Palm ID</th><th>Payer</th><th class="num">Amount</th><th>Status</th><th>Auth</th><th class="num">Score</th><th class="num">Time (ms)</th></tr></thead><tbody id="txns"></tbody></table></div>
+        <div class="empty hidden" id="txns-empty">No transactions yet.</div>
+      </div>
+      <div class="card">
+        <div class="head"><h2>Audit log</h2><a class="btn small" id="exp-audit" href="#">Export CSV</a></div>
+        <div class="scroll"><table><thead><tr><th>Time</th><th>Action</th><th>Outcome</th><th>Palm ID</th><th>Details</th></tr></thead><tbody id="audit"></tbody></table></div>
+      </div>
+      <div class="card"><div class="head"><h2>Configuration</h2></div><div class="kv" id="config" style="max-width:none;margin:0"></div></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const views = ["home", "register", "capture", "pin", "result", "account", "admin"];
+let S = null, session = null, mode = null, stream = null, running = false, adminToken = null, pin = "", lastResult = null;
+const grab = document.createElement("canvas");
+const rs = n => "Rs " + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function show(v) { views.forEach(x => $("view-" + x).classList.toggle("hidden", x !== v)); window.scrollTo(0, 0); }
+function err(msg) { $("error").textContent = msg || ""; $("error").classList.toggle("hidden", !msg); }
+async function post(url, data, blob, headers) {
+  const fd = new FormData();
+  Object.entries(data || {}).forEach(([k, v]) => fd.append(k, v));
+  if (blob) fd.append("image", blob, "frame.jpg");
+  const r = await fetch(url, { method: "POST", body: fd, headers: headers || {} });
+  const j = await r.json().catch(() => ({ error: "server error" }));
+  if (!r.ok) { const e = new Error(j.error || ("HTTP " + r.status)); e.status = r.status; throw e; }
+  return j;
+}
+async function refresh() {
+  S = await (await fetch("/api/kiosk/state")).json();
+  $("chip-people").textContent = `${S.registered} registered`;
+  $("chip-device").textContent = `matcher on ${S.config.device.toUpperCase()}`;
+  $("pay-merchant").textContent = `Paying ${S.merchant.name} (${S.merchant.upi}). No card, no phone: the kiosk finds who you are.`;
+  $("pay-rules").textContent = `PIN needed above ${rs(S.rules.step_up)}; at most ${rs(S.rules.max_payment)} per payment and ${rs(S.rules.daily_limit)} per day.`;
+}
+document.querySelectorAll("[data-home]").forEach(b => b.onclick = () => show("home"));
+
+// ------------------------------------------------------------------ capture flow
+const LABELS = { register: "Register", pay: "Pay", account: "My account" };
+async function start(m, form) {
+  err(""); mode = m;
+  try { const j = await post("/api/kiosk/start", Object.assign({ mode: m }, form)); session = j.session; var steps = j.steps; }
+  catch (e) { err(e.message); return; }
+  $("mode-badge").textContent = m === "pay" ? `Pay ${rs(form.amount)} to ${S.merchant.name}` : LABELS[m];
+  $("st-process-label").textContent = { register: "Duplicate check and palm ID", pay: "Find your palm ID", account: "Find your palm ID" }[m];
+  ["position", "liveness", "capture", "process"].forEach(s => $("st-" + s).className = "");
+  $("pips").innerHTML = Array.from({ length: steps }, () => "<span></span>").join("");
+  show("capture");
+  try { if (!stream) stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }, audio: false }); }
+  catch (e) { err("Camera not available: " + e.message + (location.protocol === "http:" && location.hostname !== "127.0.0.1" && location.hostname !== "localhost" ? " (other devices need the https address: start the kiosk with --https)" : "")); show("home"); return; }
+  const v = $("video"); v.srcObject = stream; await v.play();
+  running = true; loop();
+}
+
+async function loop() {
+  const v = $("video");
+  while (running && session) {
+    if (!v.videoWidth) { await new Promise(r => setTimeout(r, 100)); continue; }
+    grab.width = v.videoWidth; grab.height = v.videoHeight;
+    grab.getContext("2d").drawImage(v, 0, 0);
+    const blob = await new Promise(r => grab.toBlob(r, "image/jpeg", 0.9));
+    let j;
+    try { j = await post("/api/kiosk/frame", { session }, blob); }
+    catch (e) { err(e.message); stop(); show("home"); return; }
+    if (!running) return;
+    render(j);
+    if (j.phase === "captured") { await finish(); return; }
+    if (j.phase === "done") { stop(); showResult(j.result); return; }
+  }
+}
+
+function render(j) {
+  $("prompt").firstChild.textContent = (j.prompt || "").replace(/^./, c => c.toUpperCase());
+  const lv = j.liveness;
+  $("prompt-sub").textContent = j.phase === "liveness" && lv ? `step ${Math.min(lv.step + 1, lv.steps)} of ${lv.steps}` : j.phase === "capture" ? `photo ${j.photos + 1} of ${j.photos_needed}` : "";
+  const k = ["position", "liveness", "capture", "captured"].indexOf(j.phase);
+  ["position", "liveness", "capture", "process"].forEach((s, i) => $("st-" + s).className = i < k ? "done" : i === k ? "active" : "");
+  if (lv) [...$("pips").children].forEach((p, i) => p.className = i < lv.step ? "on" : i === lv.step && lv.status === "running" ? "cur" : "");
+  $("st-capture-sub").textContent = `${j.photos} of ${j.photos_needed} photos`;
+  const h = j.hand;
+  $("r-count").textContent = h ? h.count ?? "–" : "no hand";
+  $("r-spread").textContent = h ? `${h.spread}°` : "–";
+  $("r-quality").textContent = h && h.quality ? `${h.quality}/100` : "–";
+  $("r-meter").style.width = `${h && h.quality ? h.quality : 0}%`;
+  $("r-ms").textContent = j.ms != null ? `${j.ms} ms` : "–";
+  $("issues").innerHTML = (j.issues || []).map(x => `<li>${esc(x)}</li>`).join("");
+  draw(h);
+}
+
+const BONES = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+function draw(h) {
+  const c = $("overlay"), v = $("video"), W = c.clientWidth, H = c.clientHeight;
+  c.width = W * devicePixelRatio; c.height = H * devicePixelRatio;
+  const g = c.getContext("2d"); g.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); g.clearRect(0, 0, W, H);
+  if (!h || !v.videoWidth) return;
+  const s = Math.max(W / v.videoWidth, H / v.videoHeight), ox = (W - v.videoWidth * s) / 2, oy = (H - v.videoHeight * s) / 2;
+  const P = h.pts.map(([x, y]) => [W - (ox + x * s), oy + y * s]);
+  g.lineWidth = 3; g.strokeStyle = "rgba(91,140,255,.9)"; g.lineCap = "round";
+  BONES.forEach(([a, b]) => { g.beginPath(); g.moveTo(...P[a]); g.lineTo(...P[b]); g.stroke(); });
+  g.fillStyle = "#fff"; P.forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 3.5, 0, 7); g.fill(); });
+}
+
+async function finish() {
+  running = false;
+  $("prompt").firstChild.textContent = { register: "Creating your palm ID…", pay: "Finding your palm ID…", account: "Finding your palm ID…" }[mode];
+  $("prompt-sub").textContent = ""; $("st-process").className = "active";
+  try {
+    const j = await post("/api/kiosk/finish", { session });
+    stopCamera();
+    const r = j.result;
+    if (r.kind === "pin_required") return askPin(r);
+    if (r.kind === "account") return showAccount(r);
+    session = null; showResult(r);
+  } catch (e) { err(e.message); show("home"); session = null; }
+  stopCamera(); refresh();
+}
+function stop() { running = false; if (session) post("/api/kiosk/cancel", { session }).catch(() => {}); session = null; stopCamera(); }
+function stopCamera() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
+
+// ------------------------------------------------------------------ PIN step-up
+function askPin(r) {
+  pin = ""; $("pin-msg").textContent = "";
+  $("pin-info").textContent = `${r.id}${r.name ? " · " + r.name : ""} · ${rs(r.amount)} to ${S.merchant.name}`;
+  $("pinpad").innerHTML = ["1","2","3","4","5","6","7","8","9","⌫","0","OK"].map(k => `<button data-k="${k}">${k}</button>`).join("");
+  $("pinpad").querySelectorAll("button").forEach(b => b.onclick = () => pinKey(b.dataset.k));
+  pinDots(); show("pin");
+}
+function pinDots() { $("pindots").innerHTML = Array.from({ length: Math.max(4, pin.length) }, (_, i) => `<span class="${i < pin.length ? "on" : ""}"></span>`).join(""); }
+async function pinKey(k) {
+  if (k === "⌫") pin = pin.slice(0, -1);
+  else if (k === "OK") {
+    if (pin.length < 4) return;
+    try {
+      const j = await post("/api/kiosk/pin", { session, pin });
+      pin = "";
+      if (j.retry) { $("pin-msg").textContent = `Wrong PIN. ${j.tries_left} tr${j.tries_left === 1 ? "y" : "ies"} left.`; pinDots(); return; }
+      session = null; showResult(j.result); refresh(); return;
+    } catch (e) { session = null; err(e.message); show("home"); return; }
+  } else if (pin.length < 6) pin += k;
+  pinDots();
+}
+
+// ------------------------------------------------------------------ results
+function showResult(r) {
+  lastResult = r;
+  const ok = !!r.ok, t = r.timing || {}, p = r.pad, x = r.txn;
+  const rows = [];
+  if (x) {
+    rows.push(["Transaction", x.txn_id], ["Amount", rs(x.amount)], ["Paid to", x.merchant], ["Payer", `${r.id || ""} · ${x.payer || ""}`]);
+    rows.push(["Authentication", x.auth || "palm"]);
+    if (x.status === "approved") rows.push(["Balance after", rs(x.balance)]);
+  }
+  if (r.kind === "registered") rows.push(["UPI ID", r.upi], ["Demo wallet", rs(r.balance)]);
+  if (r.kind === "duplicate") rows.push(["Existing palm ID", r.existing]);
+  if (r.score != null) rows.push(["Match score", `${r.score} (threshold ${S.config.threshold})`]);
+  if (p) rows.push(["Screen/print check", `${p.recapture} (limit ${p.threshold}), ${p.flagged ? (p.mode === "enforce" ? "rejected" : "flagged, warn only") : "live"}`]);
+  if (t.total_ms != null) rows.push(["Time after capture", `${t.total_ms} ms (template ${t.templates_ms}, search ${t.search_ms}, matcher ${t.match_ms} ms, ${t.comparisons} comparison${t.comparisons === 1 ? "" : "s"})`]);
+  const title = { registered: "Palm registered", approved: "Payment approved", declined: "Payment declined", duplicate: "Already registered",
+    unknown: "Palm not recognised", liveness: "Liveness check failed", spoof: "Possible spoof", timeout: "Timed out", capture: "No clear photo", erased: "Palm data erased" }[r.kind] || "Not completed";
+  const big = r.kind === "registered" ? r.id : r.kind === "duplicate" ? r.existing : x && x.status === "approved" ? rs(x.amount) : "";
+  $("result").className = "card result " + (ok ? "ok" : "bad");
+  $("result").innerHTML = `<div class="icon">${ok ? "✓" : "!"}</div><h2>${title}</h2>${big ? `<div class="big">${esc(big)}</div>` : ""}
+    ${r.kind === "registered" ? `<div>Remember: you pay with your palm. Your palm ID is only for support.</div>` : ""}
+    <p style="color:var(--ink-2)">${esc(r.message || "")}</p>
+    ${rows.length ? `<div class="kv">${rows.map(([k, v]) => `<span>${k}</span><b>${esc(v)}</b>`).join("")}</div>` : ""}
+    ${x && x.message ? `<details style="margin-top:14px;text-align:left"><summary class="sub" style="cursor:pointer">Payment message (simulated pacs.008)</summary><pre class="msg">${esc(JSON.stringify(x.message, null, 2))}</pre></details>` : ""}
+    <div class="actions"><button class="btn primary" onclick="show('home')">Done</button>
+    ${["liveness", "timeout", "capture", "unknown"].includes(r.kind) ? `<button class="btn" onclick="again()">Try again</button>` : ""}</div>`;
+  show("result");
+}
+function again() { if (mode === "pay") start("pay", { amount: $("amount").value }); else if (mode === "account") start("account", {}); else show("register"); }
+
+function showAccount(r) {
+  const tx = r.transactions || [];
+  $("account").innerHTML = `<div class="head"><h2>${esc(r.name || "My account")} · ${r.id}</h2><button class="btn small" onclick="closeAccount()">Close</button></div>
+    <div class="tiles" style="margin-bottom:16px">
+      <div class="tile"><div class="l">Balance (demo)</div><div class="v">${rs(r.balance)}</div></div>
+      <div class="tile"><div class="l">Spent today</div><div class="v">${rs(r.spent_today)}</div><div class="n">limit ${rs(r.daily_limit)}</div></div>
+      <div class="tile"><div class="l">UPI ID</div><div class="v" style="font-size:18px">${esc(r.upi)}</div><div class="n">PIN ${r.has_pin ? "set" : "not set"}</div></div>
+    </div>
+    <h3>Recent payments</h3>
+    ${tx.length ? `<div class="scroll"><table><thead><tr><th>Time</th><th>Paid to</th><th class="num">Amount</th><th>Status</th><th>Auth</th></tr></thead><tbody>${tx.map(t => `<tr><td>${t.time.replace("T", " ")}</td><td>${esc(t.merchant)}</td><td class="num">${rs(t.amount)}</td><td><span class="pill ${t.status === "approved" ? "good" : "bad"}">${t.status}</span>${t.reason ? `<div class="sub">${esc(t.reason)}</div>` : ""}</td><td>${esc(t.auth || "–")}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">No payments yet.</div>`}
+    <div class="consent" style="margin-top:18px"><b>Erase my palm</b><br>Deletes your palm templates, your search code and your demo wallet from this kiosk. Your past payments stay in the merchant's records with a masked UPI ID. You can register again later.</div>
+    <button class="btn danger" onclick="eraseMe('${r.id}')">Erase my palm data</button>`;
+  show("account");
+}
+function closeAccount() { if (session) post("/api/kiosk/cancel", { session }).catch(() => {}); session = null; show("home"); }
+async function eraseMe(id) {
+  if (!confirm(`Erase ${id}? Your palm templates, search code and demo wallet are deleted. This cannot be undone.`)) return;
+  try { await post("/api/kiosk/erase", { session }); session = null; showResult({ ok: true, kind: "erased", message: `${id} and its data were erased.` }); refresh(); }
+  catch (e) { err(e.message); show("home"); }
+}
+
+// ------------------------------------------------------------------ admin
+const H = () => ({ "X-Admin-Token": adminToken });
+async function adminOpen() {
+  if (adminToken && await adminLoad()) return;
+  const setup = !S.admin_setup;
+  $("admin-login-title").textContent = setup ? "Set the admin PIN" : "Admin login";
+  $("admin-login-note").textContent = setup ? "First start: choose a 6-8 digit admin PIN. It is stored as a PBKDF2 hash." : "";
+  $("admin-pin2-wrap").classList.toggle("hidden", !setup);
+  $("admin-go").textContent = setup ? "Set PIN and log in" : "Log in";
+  $("admin-login").classList.remove("hidden"); $("admin-panel").classList.add("hidden");
+}
+$("admin-go").onclick = async () => {
+  err("");
+  const p = $("admin-pin").value;
+  try {
+    if (!S.admin_setup) {
+      if (p !== $("admin-pin2").value) { err("The two PINs differ."); return; }
+      adminToken = (await post("/api/admin/setup", { pin: p })).token; await refresh();
+    } else adminToken = (await post("/api/admin/login", { pin: p })).token;
+    $("admin-pin").value = $("admin-pin2").value = "";
+    await adminLoad();
+  } catch (e) { err(e.message); }
+};
+async function adminLoad() {
+  const r = await fetch("/api/admin/overview", { headers: H() });
+  if (r.status === 401) { adminToken = null; return false; }
+  renderAdmin(await r.json()); return true;
+}
+function renderAdmin(A) {
+  $("admin-login").classList.add("hidden"); $("admin-panel").classList.remove("hidden");
+  const st = A.stats, pctv = v => v == null ? "–" : (100 * v).toFixed(1) + "%";
+  $("tiles").innerHTML = [["Registered palms", st.registered, ""], ["Payments approved", st.approved, rs(st.approved_amount)],
+    ["Payments declined", st.declined, ""], ["Identification rate", pctv(st.identification_rate), `${st.identified} of ${st.searches} searches`],
+    ["Liveness failures", st.liveness_failed, `${st.timeouts} timeouts`], ["Duplicates blocked", st.duplicates_blocked, ""],
+    ["Spoof flags", st.spoof_flags, A.config.pad === "enforce" ? "enforced" : "warn only"], ["Median time after capture", st.median_latency_ms == null ? "–" : st.median_latency_ms + " ms", "payments"]]
+    .map(([l, v, n]) => `<div class="tile"><div class="l">${l}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("");
+  $("people").innerHTML = A.people.map(p => `<tr><td><b>${p.id}</b></td><td>${esc(p.name || "–")}</td><td>${esc(p.upi)}</td>
+    <td class="num">${rs(p.balance)}</td><td class="num">${rs(p.spent_today)} / ${rs(p.daily_limit)}</td><td>${p.has_pin ? "yes" : "no"}</td>
+    <td>${p.consent.slice(0, 10)}</td><td class="num">${(p.template_bytes / 1024).toFixed(0)} KB + ${p.search_bytes} B</td>
+    <td><button class="btn small" onclick="topUp('${p.id}')">Top up</button> <button class="btn small danger" onclick="del('${p.id}')">Delete</button></td></tr>`).join("");
+  $("people-empty").classList.toggle("hidden", A.people.length > 0);
+  $("txns").innerHTML = A.transactions.map(t => `<tr><td>${t.time.replace("T", " ")}</td><td>${t.txn_id}</td><td>${t.palm_id || "–"}</td><td>${esc(t.payer_upi || "–")}</td>
+    <td class="num">${rs(t.amount)}</td><td><span class="pill ${t.status === "approved" ? "good" : "bad"}">${t.status}</span>${t.reason ? `<div class="sub">${esc(t.reason)}</div>` : ""}</td>
+    <td>${esc(t.auth || "–")}</td><td class="num">${t.score ?? "–"}</td><td class="num">${t.latency_ms ?? "–"}</td></tr>`).join("");
+  $("txns-empty").classList.toggle("hidden", A.transactions.length > 0);
+  const cls = o => /registered|identified|approved|viewed|login|erased|set|top-up/.test(o) ? "good" : /duplicate|timeout|declined|not recognised|no clear/.test(o) ? "warn" : "bad";
+  $("audit").innerHTML = A.audit.map(a => {
+    const d = Object.entries(a).filter(([k]) => !["id", "time", "action", "outcome", "palm_id"].includes(k)).map(([k, v]) => `${k}: ${typeof v === "object" ? JSON.stringify(v) : v}`).join(", ");
+    return `<tr><td>${a.time.replace("T", " ")}</td><td>${a.action}</td><td><span class="pill ${cls(a.outcome || "")}">${esc(a.outcome || "")}</span></td><td>${a.palm_id || "–"}</td><td class="sub">${esc(d)}</td></tr>`;
+  }).join("");
+  const c = A.config;
+  $("config").innerHTML = [["Matcher", `v4: v3c keypoints${c.fusion ? " + SIFT fusion" : ""}, preprocessing ${c.preprocess}, threshold ${c.threshold}`],
+    ["Search", `protected HOL vector (IoM ${c.iom}), top ${c.shortlist} re-checked by the matcher`],
+    ["Liveness", "random finger counts at random times, checked on the server"],
+    ["Screen/print check", `limit ${c.recapture_threshold}, ${c.pad === "enforce" ? "enforced" : "warn only"}`],
+    ["Payment rules", `PIN above ${rs(c.rules.step_up)}, max ${rs(c.rules.max_payment)} per payment, ${rs(c.rules.daily_limit)} per day`],
+    ["Merchant", `${c.merchant.name} (${c.merchant.upi})`], ["Device", c.device], ["Payments", "simulated: demo wallets, nothing sent to a bank"]]
+    .map(([k, v]) => `<span>${k}</span><b>${esc(v)}</b>`).join("");
+  $("lock-pill").textContent = A.locked ? `kiosk locked for ${A.locked} s after failed attempts` : "";
+  $("lock-pill").className = A.locked ? "pill bad" : "hidden";
+  $("exp-txn").href = `/api/admin/export/transactions.csv?token=${encodeURIComponent(adminToken)}`;
+  $("exp-audit").href = `/api/admin/export/audit.csv?token=${encodeURIComponent(adminToken)}`;
+}
+async function del(id) {
+  if (!confirm(`Delete ${id}? Templates, search code and demo wallet are erased. This cannot be undone.`)) return;
+  try { renderAdmin(await post("/api/admin/delete", { id }, null, H())); refresh(); } catch (e) { err(e.message); }
+}
+async function topUp(id) {
+  const a = prompt(`Demo top-up for ${id} (Rs):`, "1000"); if (!a) return;
+  try { renderAdmin(await post("/api/admin/topup", { id, amount: a }, null, H())); } catch (e) { err(e.message); }
+}
+$("admin-refresh").onclick = () => adminLoad();
+$("admin-logout").onclick = () => { adminToken = null; adminOpen(); };
+
+// ------------------------------------------------------------------ navigation
+$("go-pay").onclick = () => start("pay", { amount: $("amount").value });
+$("go-register").onclick = () => { err(""); show("register"); };
+$("go-account").onclick = () => start("account", {});
+$("r-start").onclick = () => start("register", { name: $("r-name").value, upi: $("r-upi").value, balance: $("r-balance").value,
+  pin: $("r-pin").value, consent: $("r-consent").checked ? "1" : "0" });
+$("cancel").onclick = () => { stop(); show("home"); };
+$("nav-kiosk").onclick = () => { $("nav-kiosk").className = "on"; $("nav-admin").className = ""; err(""); if (!running) show("home"); };
+$("nav-admin").onclick = async () => { $("nav-admin").className = "on"; $("nav-kiosk").className = ""; err(""); stop(); await refresh(); show("admin"); adminOpen(); };
+refresh().then(() => {                                   // deep links: #register, #admin (e.g. an admin screen next to the kiosk)
+  if (location.hash === "#register") show("register");
+  if (location.hash === "#admin") $("nav-admin").onclick();
+});
+</script>
+</body>
+</html>
