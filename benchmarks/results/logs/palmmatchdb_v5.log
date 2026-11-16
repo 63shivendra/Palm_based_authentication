@@ -1,0 +1,75 @@
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+WARNING: Logging before InitGoogle() is written to STDERR
+W0000 00:00:1794819803.907380   40136 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1794819803.914580   18620 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1794819803.940673   30420 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[progress] v4 features:   5% (11/215) elapsed 0m25s, about 7m53s left
+[progress] v4 features:  10% (22/215) elapsed 0m27s, about 3m59s left
+[progress] v4 features:  15% (33/215) elapsed 0m28s, about 2m38s left
+[progress] v4 features:  20% (43/215) elapsed 0m30s, about 2m00s left
+[progress] v4 features:  25% (54/215) elapsed 0m31s, about 1m33s left
+[progress] v4 features:  30% (65/215) elapsed 0m33s, about 1m16s left
+[progress] v4 features:  35% (76/215) elapsed 0m34s, about 1m03s left
+[progress] v4 features:  40% (86/215) elapsed 0m35s, about 0m53s left
+[progress] v4 features:  45% (97/215) elapsed 0m36s, about 0m45s left
+[progress] v4 features:  50% (108/215) elapsed 0m38s, about 0m38s left
+[progress] v4 features:  55% (119/215) elapsed 0m39s, about 0m32s left
+[progress] v4 features:  60% (129/215) elapsed 0m40s, about 0m27s left
+[progress] v4 features:  65% (140/215) elapsed 0m42s, about 0m22s left
+[progress] v4 features:  70% (151/215) elapsed 0m43s, about 0m18s left
+[progress] v4 features:  75% (162/215) elapsed 0m44s, about 0m14s left
+[progress] v4 features:  80% (173/215) elapsed 0m46s, about 0m11s left
+[progress] v4 features:  85% (183/215) elapsed 0m47s, about 0m08s left
+[progress] v4 features:  90% (194/215) elapsed 0m48s, about 0m05s left
+[progress] v4 features:  95% (205/215) elapsed 0m50s, about 0m02s left
+[progress] v4 features: 100% (215/215) elapsed 0m51s, about 0m00s left
+[progress] v4 comparisons:   5% (647/12,931) elapsed 0m54s, about 17m15s left
+[progress] v4 comparisons:  10% (1,294/12,931) elapsed 2m46s, about 24m55s left
+[progress] v4 comparisons:  15% (1,940/12,931) elapsed 3m58s, about 22m32s left
+[progress] v4 comparisons:  20% (2,587/12,931) elapsed 5m15s, about 21m02s left
+[progress] v4 comparisons:  25% (3,233/12,931) elapsed 6m31s, about 19m33s left
+[progress] v4 comparisons:  30% (3,880/12,931) elapsed 7m50s, about 18m17s left
+[progress] v4 comparisons:  35% (4,526/12,931) elapsed 9m09s, about 17m00s left
+[progress] v4 comparisons:  40% (5,173/12,931) elapsed 10m27s, about 15m41s left
+[progress] v4 comparisons:  45% (5,819/12,931) elapsed 11m46s, about 14m23s left
+[progress] v4 comparisons:  50% (6,466/12,931) elapsed 13m04s, about 13m03s left
+[progress] v4 comparisons:  55% (7,113/12,931) elapsed 14m24s, about 11m47s left
+[progress] v4 comparisons:  60% (7,759/12,931) elapsed 15m43s, about 10m29s left
+[progress] v4 comparisons:  65% (8,406/12,931) elapsed 17m05s, about 9m11s left
+[progress] v4 comparisons:  70% (9,052/12,931) elapsed 18m25s, about 7m53s left
+[progress] v4 comparisons:  75% (9,699/12,931) elapsed 19m45s, about 6m35s left
+[progress] v4 comparisons:  80% (10,345/12,931) elapsed 21m06s, about 5m16s left
+[progress] v4 comparisons:  85% (10,992/12,931) elapsed 22m26s, about 3m57s left
+[progress] v4 comparisons:  90% (11,638/12,931) elapsed 23m45s, about 2m38s left
+[progress] v4 comparisons:  95% (12,285/12,931) elapsed 25m05s, about 1m19s left
+[progress] v4 comparisons: 100% (12,931/12,931) elapsed 26m25s, about 0m00s left
+[palmmatchdb] 10528 files -> 531 distinct images, 50 palms (subject+hand), 39 with 2+ images, 172 images dropped (appear under 2+ palms), 160 unparsed
+[palmmatchdb] 215 images, 39 identities, hand detection on, protocol all-vs-all
+Loaded LightGlue model
+Loaded LightGlue model
+
+=== palmmatchdb | method v4 | protocol all-vs-all (trusted-label pairs) ===
+images 215  usable 214  identities 39  FTE 0.47% {'no hand found': 1}
+comparisons: genuine 473  impostor 12458
+at operating threshold (10.0 score): FMR 0.00%  FNMR 2.96%  |  system FAR 0.00%  FRR 3.41%
+EER 1.69% (at 1.2 score)   TAR@FMR=1e-2 98.31%  1e-3 98.10%  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 39)   d' 3.12   AUC 0.9930
+scores: genuine median 174.327 (worst 0.000)   impostor median 0.000 (most similar 6.021)   [1637.1 s]
+
+=== palmmatchdb | method v4 | protocol all-vs-all (trusted-label pairs), 3-photo enrolment (37 palms enrolled) ===
+images 215  usable 214  identities 39  FTE 0.47% {'no hand found': 1}
+comparisons: genuine 99  impostor 2010
+at operating threshold (10.0 score): FMR 0.00%  FNMR 0.00%  |  system FAR 0.00%  FRR 0.47%
+EER 0.00% (at 23.4 score)   TAR@FMR=1e-2 100.00%  1e-3 n/a  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 39)   d' 3.55   AUC 1.0000
+scores: genuine median 203.644 (worst 42.253)   impostor median 0.000 (most similar 4.520)   [2020.2 s]
+
+saved D:\PALM_payments\benchmarks\results/palmmatchdb.json and score/DET plots
+Note: claiming FAR <= 1e-5 needs >= 300,000 independent impostor comparisons (rule of 3).
+Exception ignored in: <function HandLandmarker.__del__ at 0x0000020AB923EE80>
+Traceback (most recent call last):
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\vision\hand_landmarker.py", line 614, in __del__
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\vision\hand_landmarker.py", line 590, in close
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\core\serial_dispatcher.py", line 74, in shutdown_aware_handler
+  File "C:\Users\admin\miniconda3\Lib\site-packages\mediapipe\tasks\python\core\mediapipe_c_utils.py", line 126, in dispatcher_wrapper
+TypeError: 'NoneType' object is not callable

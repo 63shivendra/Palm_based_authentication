@@ -1,0 +1,63 @@
+[progress] v4 features:   6% (6/103) elapsed 0m03s, about 0m50s left
+[progress] v4 features:  11% (11/103) elapsed 0m03s, about 0m29s left
+[progress] v4 features:  16% (16/103) elapsed 0m03s, about 0m21s left
+[progress] v4 features:  20% (21/103) elapsed 0m04s, about 0m16s left
+[progress] v4 features:  25% (26/103) elapsed 0m04s, about 0m13s left
+[progress] v4 features:  30% (31/103) elapsed 0m05s, about 0m11s left
+[progress] v4 features:  36% (37/103) elapsed 0m05s, about 0m09s left
+[progress] v4 features:  41% (42/103) elapsed 0m05s, about 0m08s left
+[progress] v4 features:  46% (47/103) elapsed 0m06s, about 0m07s left
+[progress] v4 features:  50% (52/103) elapsed 0m06s, about 0m06s left
+[progress] v4 features:  55% (57/103) elapsed 0m07s, about 0m05s left
+[progress] v4 features:  60% (62/103) elapsed 0m07s, about 0m04s left
+[progress] v4 features:  65% (67/103) elapsed 0m07s, about 0m04s left
+[progress] v4 features:  71% (73/103) elapsed 0m08s, about 0m03s left
+[progress] v4 features:  76% (78/103) elapsed 0m08s, about 0m02s left
+[progress] v4 features:  81% (83/103) elapsed 0m09s, about 0m02s left
+[progress] v4 features:  85% (88/103) elapsed 0m09s, about 0m01s left
+[progress] v4 features:  90% (93/103) elapsed 0m09s, about 0m01s left
+[progress] v4 features:  95% (98/103) elapsed 0m10s, about 0m00s left
+[progress] v4 features: 100% (103/103) elapsed 0m10s, about 0m00s left
+[progress] v4 comparisons:   5% (263/5,253) elapsed 0m09s, about 2m58s left
+[progress] v4 comparisons:  10% (526/5,253) elapsed 0m37s, about 5m37s left
+[progress] v4 comparisons:  15% (788/5,253) elapsed 1m10s, about 6m37s left
+[progress] v4 comparisons:  20% (1,051/5,253) elapsed 1m42s, about 6m51s left
+[progress] v4 comparisons:  25% (1,314/5,253) elapsed 2m15s, about 6m45s left
+[progress] v4 comparisons:  30% (1,576/5,253) elapsed 2m48s, about 6m32s left
+[progress] v4 comparisons:  35% (1,839/5,253) elapsed 3m21s, about 6m13s left
+[progress] v4 comparisons:  40% (2,102/5,253) elapsed 3m53s, about 5m50s left
+[progress] v4 comparisons:  45% (2,364/5,253) elapsed 4m26s, about 5m25s left
+[progress] v4 comparisons:  50% (2,627/5,253) elapsed 4m59s, about 4m59s left
+[progress] v4 comparisons:  55% (2,890/5,253) elapsed 5m32s, about 4m31s left
+[progress] v4 comparisons:  60% (3,152/5,253) elapsed 6m04s, about 4m03s left
+[progress] v4 comparisons:  65% (3,415/5,253) elapsed 6m37s, about 3m33s left
+[progress] v4 comparisons:  70% (3,678/5,253) elapsed 7m10s, about 3m04s left
+[progress] v4 comparisons:  75% (3,940/5,253) elapsed 7m42s, about 2m34s left
+[progress] v4 comparisons:  80% (4,203/5,253) elapsed 8m13s, about 2m03s left
+[progress] v4 comparisons:  85% (4,466/5,253) elapsed 8m44s, about 1m32s left
+[progress] v4 comparisons:  90% (4,728/5,253) elapsed 9m14s, about 1m01s left
+[progress] v4 comparisons:  95% (4,991/5,253) elapsed 9m45s, about 0m30s left
+[progress] v4 comparisons: 100% (5,253/5,253) elapsed 10m15s, about 0m00s left
+[folder] 103 images, 15 identities, hand detection off (ROI images), protocol all-vs-all
+Loaded LightGlue model
+Loaded LightGlue model
+
+=== gabor | method v4 | protocol all-vs-all ===
+images 103  usable 103  identities 15  FTE 0.00% 
+comparisons: genuine 311  impostor 4942
+at operating threshold (10.0 score): FMR 0.00%  FNMR 3.22%  |  system FAR 0.00%  FRR 3.22%
+EER 0.32% (at 2.5 score)   TAR@FMR=1e-2 99.68%  1e-3 99.04%  1e-4 n/a
+Rank-1 98.86% (88 probes, gallery 15)   d' 1.04   AUC 1.0000
+scores: genuine median 90.507 (worst 1.687)   impostor median 0.000 (most similar 5.552)   [699.8 s]
+
+=== gabor | method v4 | protocol all-vs-all, 3-photo enrolment (15 palms enrolled) ===
+images 103  usable 103  identities 15  FTE 0.00% 
+comparisons: genuine 58  impostor 812
+at operating threshold (10.0 score): FMR 0.00%  FNMR 1.72%  |  system FAR 0.00%  FRR 1.72%
+EER 0.00% (at 7.0 score)   TAR@FMR=1e-2 100.00%  1e-3 n/a  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 15)   d' 1.17   AUC 1.0000
+scores: genuine median 134.652 (worst 8.417)   impostor median 0.174 (most similar 5.552)   [796.9 s]
+
+saved D:\PALM_payments\benchmarks\results/gabor.json and score/DET plots
+WARNING: fewer than 20 identities - smoke test only, not an accuracy measurement.
+Note: claiming FAR <= 1e-5 needs >= 300,000 independent impostor comparisons (rule of 3).

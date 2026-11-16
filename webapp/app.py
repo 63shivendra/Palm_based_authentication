@@ -13,6 +13,7 @@ and the dashboard shows their decisions, scores and timings side by side:
   v3    palm_match.py           full template (2,048 keypoints)
   v3c   palm_match_compact.py   compact template (1,024 keypoints, 1 byte per value)
   v3cr  palm_match_robust.py    v3c + noise-adaptive smoothing + retry on failure
+  v5    palm_match_v5.py        v3cr + full-accuracy LightGlue, affine check, confidence-weighted score
 
 Only templates are stored, in webapp/data/ (git-ignored). Photos are never written to disk.
 There is NO spoof detection: a photo of a palm can be accepted.
@@ -38,6 +39,7 @@ sys.path.insert(0, ROOT)
 import palm_match as pm  # noqa: E402
 import palm_match_compact as pmc  # noqa: E402
 import palm_match_robust as pmr  # noqa: E402
+import palm_match_v5 as pm5  # noqa: E402
 
 DATA = os.path.join(HERE, "data")
 USERS_DIR = os.path.join(DATA, "users")
@@ -49,6 +51,7 @@ MODELS = [
     dict(key="v3", name="v3", detail="Full template, 2,048 keypoints", threshold=float(pm.V3_THRESHOLD)),
     dict(key="v3c", name="v3c", detail="Compact template, 1,024 keypoints", threshold=float(pmc.THRESHOLD)),
     dict(key="v3cr", name="v3cr", detail="v3c + noise smoothing and retry", threshold=float(pmr.THRESHOLD)),
+    dict(key="v5", name="v5", detail="v3cr + full LightGlue, affine check, confidence score", threshold=float(pm5.THRESHOLD)),
 ]
 THRESHOLD = {m["key"]: m["threshold"] for m in MODELS}
 ATTEMPT = ["first attempt", "smoothed retry"] + [f"retry rotated {a:+d}°" for a in pmr.RETRY_ANGLES]
@@ -76,6 +79,7 @@ def save_user(s):
     pm.save_templates_v3(os.path.join(d, "v3.npz"), u["tpl"]["v3"])
     pmc.save_templates(os.path.join(d, "v3c.npz"), u["tpl"]["v3c"])
     pmc.save_templates(os.path.join(d, "v3cr.npz"), u["tpl"]["v3cr"])
+    pmc.save_templates(os.path.join(d, "v5.npz"), u["tpl"]["v5"])
     u["bytes"] = {m["key"]: os.path.getsize(os.path.join(d, m["key"] + ".npz")) for m in MODELS}
     with open(os.path.join(d, "meta.json"), "w", encoding="utf-8") as f:
         json.dump(dict(name=u["name"], created=u["created"]), f)
@@ -91,6 +95,8 @@ def load_users():
             tpl = {"v3": pm.load_any_templates(os.path.join(d, "v3.npz"))[1],
                    "v3c": pmc.load_templates(os.path.join(d, "v3c.npz")),
                    "v3cr": pmc.load_templates(os.path.join(d, "v3cr.npz"))}
+            v5 = os.path.join(d, "v5.npz")
+            tpl["v5"] = pmc.load_templates(v5) if os.path.exists(v5) else list(tpl["v3cr"])   # same format
             USERS[s] = dict(meta, tpl=tpl, bytes={m["key"]: os.path.getsize(os.path.join(d, m["key"] + ".npz"))
                                                   for m in MODELS})
         except Exception as e:  # a half-written folder must not stop the app
@@ -194,6 +200,16 @@ def run_models(crop, claimed):
         return best_of([pmr.match(t, retries["probe"]) for t in USERS[s]["tpl"]["v3cr"]])
 
     timed("v3cr", lambda: pmc.features(pmr.condition(crop)), robust)
+
+    def v5(first, s):
+        r = best_of([dict(pm5.match(t, [first]), attempt=0) for t in USERS[s]["tpl"]["v5"]])
+        if r["score"] >= THRESHOLD["v5"]:
+            return r
+        if "probe" not in retries:
+            retries["probe"] = pmr.probe_of_crop(crop)
+        return best_of([pm5.match(t, retries["probe"]) for t in USERS[s]["tpl"]["v5"]])
+
+    timed("v5", lambda: pmc.features(pmr.condition(crop)), v5)
     others = [dict(id=s, name=USERS[s]["name"], claimed=s == claimed, scores=scores[s]) for s in order]
     return out, others
 
@@ -237,6 +253,7 @@ def api_enroll():
             t = time.perf_counter()
             crop, info = palm_crop(bgr)
             tpl = {"v3": pm.features_v3(crop), "v3c": pmc.features(crop), "v3cr": pmr.template_of_crop(crop)}
+            tpl["v5"] = tpl["v3cr"]                               # v5 enrols exactly like v3cr
         except pm.QualityError as e:
             log(dict(action="enrol", person=name, rejected=str(e)))
             return jsonify(ok=False, rejected=True, error=str(e), state=state())

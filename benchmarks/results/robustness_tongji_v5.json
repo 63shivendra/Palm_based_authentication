@@ -1,0 +1,119 @@
+{
+  "clean (baseline)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 197.28663110733032,
+    "impostor_max": 3.901666045188904,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "darker (x0.5)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 191.93680238723755,
+    "impostor_max": 2.8169872760772705,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "brighter (x1.5)": {
+    "FRR": 0.04,
+    "FAR": 0.0,
+    "EER": 0.025166666666666667,
+    "genuine_median": 174.86108827590942,
+    "impostor_max": 3.0746085941791534,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "low contrast (x0.4)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 181.07685089111328,
+    "impostor_max": 7.214150011539459,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "uneven light (gradient)": {
+    "FRR": 0.005,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 174.52686309814453,
+    "impostor_max": 3.8632757663726807,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "blur (sigma 2)": {
+    "FRR": 0.005,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 195.63294434547424,
+    "impostor_max": 3.962785800298055,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "blur (sigma 4)": {
+    "FRR": 0.01,
+    "FAR": 0.0,
+    "EER": 0.005166666666666667,
+    "genuine_median": 115.70648419857025,
+    "impostor_max": 1.2067314982414246,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "rotation 10 deg": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 199.93006896972656,
+    "impostor_max": 5.261425971984863,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "rotation 20 deg": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 194.18226957321167,
+    "impostor_max": 3.0549087524414062,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "closer (x1.15)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 150.44351196289062,
+    "impostor_max": 4.319346696138382,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "farther (x0.85)": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 165.32577276229858,
+    "impostor_max": 2.91768342256546,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "sensor noise (sigma 12)": {
+    "FRR": 0.005,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 118.40156090259552,
+    "impostor_max": 2.756998747587204,
+    "genuine": 200,
+    "impostor": 1500
+  },
+  "JPEG quality 20": {
+    "FRR": 0.0,
+    "FAR": 0.0,
+    "EER": 0.0,
+    "genuine_median": 114.3425760269165,
+    "impostor_max": 3.0882474780082703,
+    "genuine": 200,
+    "impostor": 1500
+  }
+}

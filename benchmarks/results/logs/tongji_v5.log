@@ -1,0 +1,62 @@
+[progress] v4 features:   5% (180/3,600) elapsed 0m12s, about 4m03s left
+[progress] v4 features:  10% (360/3,600) elapsed 0m23s, about 3m27s left
+[progress] v4 features:  15% (541/3,600) elapsed 0m33s, about 3m08s left
+[progress] v4 features:  20% (720/3,600) elapsed 0m43s, about 2m54s left
+[progress] v4 features:  25% (900/3,600) elapsed 0m54s, about 2m42s left
+[progress] v4 features:  30% (1,080/3,600) elapsed 1m04s, about 2m31s left
+[progress] v4 features:  35% (1,260/3,600) elapsed 1m15s, about 2m19s left
+[progress] v4 features:  40% (1,440/3,600) elapsed 1m24s, about 2m07s left
+[progress] v4 features:  45% (1,620/3,600) elapsed 1m34s, about 1m56s left
+[progress] v4 features:  50% (1,800/3,600) elapsed 1m45s, about 1m45s left
+[progress] v4 features:  55% (1,980/3,600) elapsed 1m55s, about 1m34s left
+[progress] v4 features:  60% (2,160/3,600) elapsed 2m05s, about 1m23s left
+[progress] v4 features:  65% (2,340/3,600) elapsed 2m16s, about 1m13s left
+[progress] v4 features:  70% (2,521/3,600) elapsed 2m26s, about 1m02s left
+[progress] v4 features:  75% (2,701/3,600) elapsed 2m37s, about 0m52s left
+[progress] v4 features:  80% (2,881/3,600) elapsed 2m48s, about 0m41s left
+[progress] v4 features:  85% (3,061/3,600) elapsed 2m59s, about 0m31s left
+[progress] v4 features:  90% (3,241/3,600) elapsed 3m10s, about 0m21s left
+[progress] v4 features:  95% (3,421/3,600) elapsed 3m21s, about 0m10s left
+[progress] v4 features: 100% (3,600/3,600) elapsed 3m32s, about 0m00s left
+[progress] v4 comparisons:   5% (770/15,400) elapsed 0m21s, about 6m43s left
+[progress] v4 comparisons:  10% (1,540/15,400) elapsed 0m42s, about 6m18s left
+[progress] v4 comparisons:  15% (2,311/15,400) elapsed 1m02s, about 5m54s left
+[progress] v4 comparisons:  20% (3,080/15,400) elapsed 1m23s, about 5m34s left
+[progress] v4 comparisons:  25% (3,850/15,400) elapsed 1m44s, about 5m13s left
+[progress] v4 comparisons:  30% (4,620/15,400) elapsed 2m04s, about 4m51s left
+[progress] v4 comparisons:  35% (5,390/15,400) elapsed 2m24s, about 4m29s left
+[progress] v4 comparisons:  40% (6,160/15,400) elapsed 3m42s, about 5m33s left
+[progress] v4 comparisons:  45% (6,930/15,400) elapsed 5m00s, about 6m07s left
+[progress] v4 comparisons:  50% (7,700/15,400) elapsed 6m16s, about 6m16s left
+[progress] v4 comparisons:  55% (8,470/15,400) elapsed 7m34s, about 6m12s left
+[progress] v4 comparisons:  60% (9,240/15,400) elapsed 8m51s, about 5m54s left
+[progress] v4 comparisons:  65% (10,010/15,400) elapsed 10m07s, about 5m27s left
+[progress] v4 comparisons:  70% (10,781/15,400) elapsed 11m24s, about 4m53s left
+[progress] v4 comparisons:  75% (11,551/15,400) elapsed 12m43s, about 4m14s left
+[progress] v4 comparisons:  80% (12,321/15,400) elapsed 14m03s, about 3m30s left
+[progress] v4 comparisons:  85% (13,091/15,400) elapsed 15m20s, about 2m42s left
+[progress] v4 comparisons:  90% (13,861/15,400) elapsed 16m37s, about 1m50s left
+[progress] v4 comparisons:  95% (14,631/15,400) elapsed 17m55s, about 0m56s left
+[progress] v4 comparisons: 100% (15,400/15,400) elapsed 19m12s, about 0m00s left
+[tongji] 3600 images, 600 identities, hand detection off (ROI images), protocol cross-session
+Loaded LightGlue model
+Loaded LightGlue model
+
+=== tongji | method v4 | protocol cross-session ===
+images 3600  usable 3600  identities 600  FTE 0.00% 
+comparisons: genuine 5400  impostor 10000
+at operating threshold (10.0 score): FMR 0.00%  FNMR 0.09%  |  system FAR 0.00%  FRR 0.09%
+EER 0.06% (at 3.8 score)   TAR@FMR=1e-2 99.98%  1e-3 99.96%  1e-4 n/a
+Rank-1 100.00% (10 probes, gallery 600)   d' 4.49   AUC 1.0000
+scores: genuine median 188.196 (worst 1.505)   impostor median 0.000 (most similar 8.025)   [1961.7 s]
+
+=== tongji | method v4 | protocol cross-session, 3-photo enrolment (600 palms enrolled) ===
+images 3600  usable 3600  identities 600  FTE 0.00% 
+comparisons: genuine 1800  impostor 10000
+at operating threshold (10.0 score): FMR 0.00%  FNMR 0.00%  |  system FAR 0.00%  FRR 0.00%
+EER 0.00% (at 21.7 score)   TAR@FMR=1e-2 100.00%  1e-3 100.00%  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 600)   d' 5.56   AUC 1.0000
+scores: genuine median 213.549 (worst 36.537)   impostor median 0.310 (most similar 6.829)   [4957.0 s]
+
+saved D:\PALM_payments\benchmarks\results/tongji.json and score/DET plots
+Note: claiming FAR <= 1e-5 needs >= 300,000 independent impostor comparisons (rule of 3).

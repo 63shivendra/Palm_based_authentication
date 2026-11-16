@@ -33,6 +33,10 @@ DATASETS = [  # key, name, source, licence, what it is, protocol
      "all pairs, restricted to pairs with trustworthy labels (same palm: photos < 10 min apart; different palm: > 1 day apart)"),
     ("gabor", "Palmprint Image Dataset with Gabor Filter (raw images)", "data.mendeley.com/datasets/r8hxykxnk5 (version 2)",
      "CC BY 4.0", "15 people, 103 raw 128x128 palm crops", "all pairs"),
+    ("tongji_full", "Tongji, published protocol", "cslinzhang.github.io/ContactlessPalm (official ROI images)",
+     "No licence stated on the official page; treated as research-only. Used for evaluation only.",
+     "600 palms, all 10 images per palm per session (12,000 images)",
+     "the protocol of the published papers: session 1 images enrolled, session 2 images verified, 1 photo per comparison"),
     ("real", "Own phone photos", "real palm images/ in this repository", "own data",
      "4 photos: 3 of one right hand (2 sessions), 1 of the left hand", "all pairs"),
 ]
@@ -45,6 +49,7 @@ NOT_TESTED = [
 METHODS = [("v3", "v3", 1), ("v3_enrol3", "v3", 3), ("v3_enrol2", "v3", 2),
            ("v3c", "v3c", 1), ("v3c_enrol3", "v3c", 3), ("v3c_enrol2", "v3c", 2),
            ("v3cr", "v3cr", 1), ("v3cr_enrol3", "v3cr", 3), ("v3cr_enrol2", "v3cr", 2),
+           ("v5", "v5", 1), ("v5_enrol3", "v5", 3), ("v5_enrol2", "v5", 2),
            ("v2", "v2", 1), ("v2_enrol3", "v2", 3), ("v2_enrol2", "v2", 2), ("v1", "v1", 1)]
 
 # Published results on the datasets we hold. EER in percent, as printed in the cited source.
@@ -68,7 +73,8 @@ LITERATURE = [  # dataset, method, EER %, trained on palm images, protocol, sour
     ("Palmprint Image Dataset with Gabor Filter", "no published result found", "", "",
      "Mendeley Data record only; no paper reporting verification results on it was found.", "web search, " + TODAY),
 ]
-OURS_FOR_LITERATURE = [("tongji", "Tongji"), ("palmmatchdb", "PalmMatchDB"), ("gabor", "Palmprint Image Dataset with Gabor Filter")]
+VERS = ["v3", "v3c", "v3cr", "v5"]
+OURS_FOR_LITERATURE = [("tongji_full", "Tongji"), ("tongji", "Tongji"), ("palmmatchdb", "PalmMatchDB"), ("gabor", "Palmprint Image Dataset with Gabor Filter")]
 
 
 def load(name):
@@ -128,35 +134,34 @@ def main():
         d = load(key)
         for n in (1, 2, 3):
             suffix = "" if n == 1 else f"_enrol{n}"
-            a, b, c = d.get("v3" + suffix), d.get("v3c" + suffix), d.get("v3cr" + suffix)
-            if not (keep(key, "v3", a) or keep(key, "v3c", b)):
+            rs = {v: d.get(v + suffix) for v in VERS}
+            if not any(keep(key, v, r) for v, r in rs.items()):
                 continue
             for label, fn in [("Accuracy %", accuracy), ("EER %", lambda r: r["EER"]), ("FAR %", lambda r: r["FAR"]),
                               ("FRR %", lambda r: r["FRR"])]:
-                wanted.append([label, name, f"{n} enrolled photo(s)", pct(fn(a), 2) if keep(key, "v3", a) else "",
-                               pct(fn(b), 2) if keep(key, "v3c", b) else "", pct(fn(c), 2) if keep(key, "v3cr", c) else "", ""])
+                wanted.append([label, name, f"{n} enrolled photo(s)"] +
+                              [pct(fn(r), 2) if keep(key, v, r) else "" for v, r in rs.items()] + [""])
     lat = load("latency")
     for stage, g, c in lat.get("rows", []):
         if stage.startswith("Total"):
             col = 4 if "v3c" in stage else 3
             for dev, val in (("GPU", g), ("CPU", c)):
-                row = ["Inference latency", lat["machine"], f"one verification, {dev}", "", "", "not measured",
+                row = ["Inference latency", lat["machine"], f"one verification, {dev}", "", "", "not measured", "not measured",
                        "not measured on a phone or terminal"]
                 row[col] = val
                 wanted.append(row)
-    ra, rb, rc = load("robustness_tongji"), load("robustness_tongji_v3c"), load("robustness_tongji_v3cr")
-    for cond in ra or rb:
+    rob = {v: load("robustness_tongji" if v == "v3" else f"robustness_tongji_{v}") for v in VERS}
+    for cond in rob["v3"]:
         cell = lambda v: f"{pct(v['FRR'], 2)} ({pct(v['FAR'], 2)})" if v else ""
-        wanted.append(["Robustness: FRR % (FAR %)", "Tongji, 200 palms, simulated", cond,
-                       cell(ra.get(cond)), cell(rb.get(cond)), cell(rc.get(cond)), ""])
-    wanted.append(["Spoof detection", "-", "-", "not measured", "not measured", "not measured",
-                   "the matcher has no liveness check"])
-    write("requested_metrics.csv", ["metric", "dataset", "condition", "v3", "v3c", "v3cr", "note"], wanted)
+        wanted.append(["Robustness: FRR % (FAR %)", "Tongji, 200 palms, simulated", cond] +
+                      [cell(rob[v].get(cond)) for v in VERS] + [""])
+    wanted.append(["Spoof detection", "-", "-"] + ["not measured"] * len(VERS) + ["the matcher has no liveness check"])
+    write("requested_metrics.csv", ["metric", "dataset", "condition"] + VERS + ["note"], wanted)
 
     # 3. robustness, 4. latency
     rows = [[m, cond, pct(v["FRR"], 2), pct(v["FAR"], 2), pct(v["EER"], 2), v["genuine_median"], v["impostor_max"],
              v["genuine"], v["impostor"]]
-            for m, rep in (("v3", ra), ("v3c", rb), ("v3cr", rc)) for cond, v in rep.items()]
+            for m, rep in rob.items() for cond, v in rep.items()]
     write("robustness.csv", ["method", "probe_condition", "FRR_pct", "FAR_pct", "EER_pct", "genuine_median_score",
                              "impostor_max_score", "genuine_comparisons", "impostor_comparisons"], rows)
     write("latency.csv", ["stage", "GPU", "CPU", "machine"], [[*r, lat["machine"]] for r in lat.get("rows", [])])
@@ -172,8 +177,8 @@ def main():
         d = load(key)
         for mk, method, n in METHODS:
             r = d.get(mk)
-            if method in ("v3", "v3c", "v3cr") and keep(key, mk, r):
-                rows.append([lname, f"OURS {method}, {n} enrolled photo(s)", pct(r["EER"], 2), "no (zero-shot)", r["protocol"],
+            if method in VERS and keep(key, mk, r):
+                rows.append([lname, f"OURS {method}, {n} enrolled photo(s)" + (", published protocol" if key == "tongji_full" else ""), pct(r["EER"], 2), "no (zero-shot)", r["protocol"],
                              "this repository, " + TODAY])
         rows += [list(x) for x in LITERATURE if x[0] == lname]
     write("literature_comparison.csv", ["dataset", "method", "EER_pct", "trained_on_palm_images", "protocol", "source"], rows)
@@ -183,7 +188,7 @@ def main():
     for key, name, *_ in DATASETS:
         for mk, method, n in METHODS:
             p = os.path.join(R, f"{key}_{mk}_scores.npz")
-            if method not in ("v3", "v3c", "v3cr") or not os.path.exists(p):
+            if method not in VERS or not os.path.exists(p):
                 continue
             z = np.load(p)
             for kind in ("genuine", "impostor"):

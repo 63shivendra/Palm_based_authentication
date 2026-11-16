@@ -1,0 +1,102 @@
+[progress] v3c features:   5% (600/12,000) elapsed 0m12s, about 4m06s left
+[progress] v3c features:  10% (1,200/12,000) elapsed 0m22s, about 3m20s left
+[progress] v3c features:  15% (1,801/12,000) elapsed 0m33s, about 3m08s left
+[progress] v3c features:  20% (2,400/12,000) elapsed 0m45s, about 3m02s left
+[progress] v3c features:  25% (3,000/12,000) elapsed 0m57s, about 2m52s left
+[progress] v3c features:  30% (3,600/12,000) elapsed 1m08s, about 2m39s left
+[progress] v3c features:  35% (4,200/12,000) elapsed 1m18s, about 2m26s left
+[progress] v3c features:  40% (4,800/12,000) elapsed 1m29s, about 2m14s left
+[progress] v3c features:  45% (5,400/12,000) elapsed 1m39s, about 2m02s left
+[progress] v3c features:  50% (6,000/12,000) elapsed 1m50s, about 1m50s left
+[progress] v3c features:  55% (6,600/12,000) elapsed 2m01s, about 1m39s left
+[progress] v3c features:  60% (7,200/12,000) elapsed 2m11s, about 1m27s left
+[progress] v3c features:  65% (7,800/12,000) elapsed 2m22s, about 1m16s left
+[progress] v3c features:  70% (8,401/12,000) elapsed 2m33s, about 1m05s left
+[progress] v3c features:  75% (9,001/12,000) elapsed 2m44s, about 0m54s left
+[progress] v3c features:  80% (9,601/12,000) elapsed 2m54s, about 0m43s left
+[progress] v3c features:  85% (10,201/12,000) elapsed 3m07s, about 0m32s left
+[progress] v3c features:  90% (10,801/12,000) elapsed 3m18s, about 0m21s left
+[progress] v3c features:  95% (11,401/12,000) elapsed 3m28s, about 0m10s left
+[progress] v3c features: 100% (12,000/12,000) elapsed 3m39s, about 0m00s left
+[progress] v3c comparisons:   5% (4,000/80,000) elapsed 2m32s, about 48m21s left
+[progress] v3c comparisons:  10% (8,000/80,000) elapsed 5m02s, about 45m25s left
+[progress] v3c comparisons:  15% (12,001/80,000) elapsed 7m34s, about 42m56s left
+[progress] v3c comparisons:  20% (16,000/80,000) elapsed 10m05s, about 40m23s left
+[progress] v3c comparisons:  25% (20,000/80,000) elapsed 12m40s, about 38m02s left
+[progress] v3c comparisons:  30% (24,000/80,000) elapsed 15m15s, about 35m36s left
+[progress] v3c comparisons:  35% (28,000/80,000) elapsed 17m50s, about 33m07s left
+[progress] v3c comparisons:  40% (32,000/80,000) elapsed 20m25s, about 30m38s left
+[progress] v3c comparisons:  45% (36,000/80,000) elapsed 22m59s, about 28m06s left
+[progress] v3c comparisons:  50% (40,000/80,000) elapsed 25m36s, about 25m36s left
+[progress] v3c comparisons:  55% (44,000/80,000) elapsed 28m11s, about 23m04s left
+[progress] v3c comparisons:  60% (48,000/80,000) elapsed 30m31s, about 20m20s left
+[progress] v3c comparisons:  65% (52,000/80,000) elapsed 33m06s, about 17m49s left
+[progress] v3c comparisons:  70% (56,001/80,000) elapsed 35m42s, about 15m17s left
+[progress] v3c comparisons:  75% (60,001/80,000) elapsed 38m17s, about 12m45s left
+[progress] v3c comparisons:  80% (64,001/80,000) elapsed 39m58s, about 9m59s left
+[progress] v3c comparisons:  85% (68,001/80,000) elapsed 41m38s, about 7m20s left
+[progress] v3c comparisons:  90% (72,001/80,000) elapsed 43m19s, about 4m48s left
+[progress] v3c comparisons:  95% (76,001/80,000) elapsed 45m02s, about 2m22s left
+[progress] v3c comparisons: 100% (80,000/80,000) elapsed 46m43s, about 0m00s left
+[progress] v4 features:   5% (600/12,000) elapsed 0m51s, about 16m12s left
+[progress] v4 features:  10% (1,200/12,000) elapsed 1m39s, about 14m53s left
+[progress] v4 features:  15% (1,801/12,000) elapsed 2m28s, about 14m02s left
+[progress] v4 features:  20% (2,400/12,000) elapsed 3m18s, about 13m15s left
+[progress] v4 features:  25% (3,000/12,000) elapsed 4m09s, about 12m28s left
+[progress] v4 features:  30% (3,600/12,000) elapsed 5m06s, about 11m54s left
+[progress] v4 features:  35% (4,200/12,000) elapsed 5m58s, about 11m05s left
+[progress] v4 features:  40% (4,800/12,000) elapsed 6m51s, about 10m16s left
+[progress] v4 features:  45% (5,400/12,000) elapsed 7m45s, about 9m29s left
+[progress] v4 features:  50% (6,000/12,000) elapsed 8m42s, about 8m42s left
+[progress] v4 features:  55% (6,600/12,000) elapsed 9m42s, about 7m56s left
+[progress] v4 features:  60% (7,200/12,000) elapsed 10m42s, about 7m08s left
+[progress] v4 features:  65% (7,800/12,000) elapsed 11m46s, about 6m20s left
+[progress] v4 features:  70% (8,401/12,000) elapsed 12m54s, about 5m31s left
+[progress] v4 features:  75% (9,001/12,000) elapsed 14m00s, about 4m40s left
+[progress] v4 features:  80% (9,601/12,000) elapsed 15m04s, about 3m45s left
+[progress] v4 features:  85% (10,201/12,000) elapsed 16m11s, about 2m51s left
+[progress] v4 features:  90% (10,801/12,000) elapsed 17m22s, about 1m55s left
+[progress] v4 features:  95% (11,401/12,000) elapsed 18m33s, about 0m58s left
+[progress] v4 features: 100% (12,000/12,000) elapsed 19m45s, about 0m00s left
+[progress] v4 comparisons:   5% (4,000/80,000) elapsed 3m45s, about 71m32s left
+[progress] v4 comparisons:  10% (8,000/80,000) elapsed 7m37s, about 68m35s left
+[progress] v4 comparisons:  15% (12,001/80,000) elapsed 11m32s, about 65m22s left
+[progress] v4 comparisons:  20% (16,000/80,000) elapsed 15m04s, about 60m17s left
+[progress] v4 comparisons:  25% (20,000/80,000) elapsed 18m42s, about 56m08s left
+[progress] v4 comparisons:  30% (24,000/80,000) elapsed 22m36s, about 52m45s left
+[progress] v4 comparisons:  35% (28,000/80,000) elapsed 26m08s, about 48m32s left
+[progress] v4 comparisons:  40% (32,000/80,000) elapsed 29m32s, about 44m19s left
+[progress] v4 comparisons:  45% (36,000/80,000) elapsed 32m54s, about 40m13s left
+[progress] v4 comparisons:  50% (40,000/80,000) elapsed 36m20s, about 36m20s left
+[progress] v4 comparisons:  55% (44,000/80,000) elapsed 39m42s, about 32m29s left
+[progress] v4 comparisons:  60% (48,000/80,000) elapsed 43m03s, about 28m42s left
+[progress] v4 comparisons:  65% (52,000/80,000) elapsed 46m28s, about 25m01s left
+[progress] v4 comparisons:  70% (56,001/80,000) elapsed 49m48s, about 21m20s left
+[progress] v4 comparisons:  75% (60,001/80,000) elapsed 53m09s, about 17m42s left
+[progress] v4 comparisons:  80% (64,001/80,000) elapsed 64m05s, about 16m01s left
+[progress] v4 comparisons:  85% (68,001/80,000) elapsed 74m54s, about 13m13s left
+[progress] v4 comparisons:  90% (72,001/80,000) elapsed 85m43s, about 9m31s left
+[progress] v4 comparisons:  95% (76,001/80,000) elapsed 96m26s, about 5m04s left
+[progress] v4 comparisons: 100% (80,000/80,000) elapsed 105m30s, about 0m00s left
+[tongji] 12000 images, 600 identities, hand detection off (ROI images), protocol cross-session
+Loaded LightGlue model
+
+=== tongji_full | method v3c | protocol cross-session ===
+images 12000  usable 12000  identities 600  FTE 0.00% 
+comparisons: genuine 60000  impostor 20000
+at operating threshold (12.0 score): FMR 0.01%  FNMR 0.10%  |  system FAR 0.01%  FRR 0.10%
+EER 0.08% (at 5.8 score)   TAR@FMR=1e-2 99.95%  1e-3 99.92%  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 600)   d' 4.36   AUC 0.9999
+scores: genuine median 283.797 (worst 0.000)   impostor median 0.000 (most similar 12.469)   [3045.8 s]
+Loaded LightGlue model
+
+=== tongji_full | method v4 | protocol cross-session ===
+images 12000  usable 12000  identities 600  FTE 0.00% 
+comparisons: genuine 60000  impostor 20000
+at operating threshold (10.0 score): FMR 0.00%  FNMR 0.11%  |  system FAR 0.00%  FRR 0.11%
+EER 0.05% (at 3.8 score)   TAR@FMR=1e-2 99.97%  1e-3 99.96%  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 600)   d' 4.52   AUC 0.9999
+scores: genuine median 186.667 (worst 0.000)   impostor median 0.000 (most similar 7.598)   [7545.9 s]
+
+saved D:\PALM_payments\benchmarks\results/tongji_full.json and score/DET plots
+Note: claiming FAR <= 1e-5 needs >= 300,000 independent impostor comparisons (rule of 3).

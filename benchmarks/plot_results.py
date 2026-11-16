@@ -21,11 +21,11 @@ from matplotlib.patches import Patch, PathPatch  # noqa: E402
 from matplotlib.path import Path  # noqa: E402
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from export_csv import R, keep, load  # noqa: E402
+from export_csv import LITERATURE, R, keep, load  # noqa: E402
 
 SURFACE, INK, INK2, MUTED, GRID, AXIS = "#fcfcfb", "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
 SERIES = {"v3": ("#2a78d6", "v3 (full template)"), "v3c": ("#eb6834", "v3c (compact template)"),
-          "v3cr": ("#1baf7a", "v3c + noise smoothing and retry")}
+          "v3cr": ("#1baf7a", "v3cr (v3c + noise smoothing, retry)"), "v5": ("#6250d6", "v5 (v3cr + new match stage)")}
 DPI = 200
 PX = DPI / 96                                   # one CSS pixel, in device pixels
 plt.rcParams["font.family"] = ["Segoe UI", "DejaVu Sans"]
@@ -120,28 +120,28 @@ def plot_accuracy(skip):
         data = load(key)
         for e, n in enumerate((1, 3)):
             res = {}
-            for m in ("v3", "v3c", "v3cr"):
+            for m in ("v3", "v3c", "v3cr", "v5"):
                 k = m + ("" if n == 1 else f"_enrol{n}")
                 r = data.get(k)
                 res[m] = r if keep(key, k, r) and f"{key}:{k}" not in skip else None
-                pending |= res[m] is None and m != "v3cr"
+                pending |= res[m] is None and m in ("v3", "v3c")
             rows.append((d * 2.5 + e, key, n, res))
     ys = [r[0] for r in rows]
-    ms = ("v3", "v3c", "v3cr") if all(res["v3cr"] for *_, res in rows) else ("v3", "v3c")   # v3cr only once complete
+    ms = tuple(m for m in ("v3", "v3c", "v3cr", "v5") if m in ("v3", "v3c") or all(res[m] for *_, res in rows))
     shown = [res[m] for *_, res in rows for m in ms if res[m]]
     far = max(r["FAR"] for r in shown) * 100
-    fh = 5.9 if len(ms) == 2 else 6.6
+    fh = {2: 5.9, 3: 6.6}.get(len(ms), 7.25)
     fig = figure(11.6, fh, "Accuracy of v3 and v3c on each dataset" if len(ms) == 2 else "Accuracy on each dataset",
                  "No palm image was used for training. Lower is better in both panels.", ms)
     panels = [("EER", "Equal error rate (EER)", 3.15), ("FRR", "Genuine users rejected (FRR)", 7.45)]
     for metric, title, left in panels:
         xmax, ticks = nice(max(r[metric] for r in shown) * 100)
-        ax = axes(fig, left, 0.95, 3.75, 3.55 if len(ms) == 2 else 4.25, xmax, ticks, lambda t: f"{t:g}%", ys, title)
+        ax = axes(fig, left, 0.95, 3.75, {2: 3.55, 3: 4.25}.get(len(ms), 4.9), xmax, ticks, lambda t: f"{t:g}%", ys, title)
         ax.set_yticks(ys)
         ax.set_yticklabels([f"{n} photo{'s' if n > 1 else ''} enrolled" for _, _, n, _ in rows] if metric == "EER" else [])
         for y, key, n, res in rows:
             group(ax, y, [(SERIES[m][0], None if res[m] is None else res[m][metric] * 100) for m in ms],
-                  lambda v: f"{v:.2f}%", thick=12 if len(ms) == 2 else 10)
+                  lambda v: f"{v:.2f}%", thick={2: 12, 3: 10}.get(len(ms), 8))
         if metric == "EER":                        # dataset names to the left of the row labels
             for d, (key, name) in enumerate(sets):
                 ids = next(res[m]["identities"] for _, k, _, res in rows if k == key for m in ms if res[m])
@@ -162,7 +162,7 @@ def plot_accuracy(skip):
 # ---------------------------------------------------------------------------------------------- 2. robustness
 def plot_robustness():
     reps = {m: load(n) for m, n in (("v3", "robustness_tongji"), ("v3c", "robustness_tongji_v3c"),
-                                    ("v3cr", "robustness_tongji_v3cr"))}
+                                    ("v3cr", "robustness_tongji_v3cr"), ("v5", "robustness_tongji_v5"))}
     full = len(reps["v3"])
     reps = {m: r for m, r in reps.items() if r and len(r) == full}        # only finished runs
     conds = list(reps["v3"])
@@ -223,6 +223,57 @@ def plot_size_speed():
     save(fig, "size_speed.png")
 
 
+# ---------------------------------------------------------------------------------------------- 4. Tongji vs papers
+def plot_tongji_papers():
+    """EER on Tongji, log scale: ours on the published protocol next to published results."""
+    full = load("tongji_full")
+    ours = [(f"Ours {m}, no palm training", full[m]["EER"] * 100, SERIES[m][0]) for m in ("v3c", "v5")
+            if keep("tongji_full", m, full.get(m))]
+    if not ours:
+        print("tongji_vs_papers.png skipped: published-protocol run not finished")
+        return
+    papers = []
+    for ds, name, eer, trained, proto, src in LITERATURE:
+        if ds != "Tongji" or not eer:
+            continue
+        v = float(eer.split(" to ")[0])
+        t = trained.lower()
+        group_ = ("trained on Tongji" if "on tongji" in t else "trained on another dataset" if "another" in t
+                  else "trained on palm images" if t.startswith("yes") else "partly tuned on palms" if t.startswith("partly")
+                  else "hand-crafted, no training")
+        papers.append((f"{name} ({group_})", v, "#c3c2b7" if "another" in t else "#898781"))
+    rows = sorted(ours + papers, key=lambda r: r[1])
+    floor = min(max(r[1], 1e-5) for r in rows) / 3
+    h = 1.2 + 0.36 * len(rows) + 0.9
+    fig = figure(10.4, h, "Tongji: equal error rate, ours next to published results",
+                 "Log scale, lower is better. Ours: all 10 images per palm per session, session 1 enrolled, session 2 verified.")
+    w, hh = fig.get_size_inches()
+    ax = fig.add_axes([4.0 / w, 0.95 / hh, 5.6 / w, 0.36 * len(rows) / hh], facecolor=SURFACE)
+    ax.set_xscale("log")
+    for k, (lab, v, col) in enumerate(rows):
+        v0 = max(v, floor * 1.0001)
+        ax.barh(k, v0 - floor, left=floor, height=0.55, color=col, zorder=3)
+        ax.text(v0 * 1.15, k, (f"{v:.2g}%" if v >= 0.01 else f"{v:.6f}".rstrip("0") + "%") if v > 0 else "0% (no error measured)",
+                va="center", fontsize=8.5, color=INK2, zorder=4)
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels([r[0] for r in rows], fontsize=9.5, color=INK2)
+    for lab in ax.get_yticklabels():
+        if lab.get_text().startswith("Ours"):
+            lab.set_color(INK); lab.set_fontweight("semibold")
+    ax.set_ylim(len(rows) - 0.4, -0.6)
+    ax.set_xlim(floor, max(r[1] for r in rows) * 12)
+    ax.xaxis.grid(True, color=GRID, lw=0.8); ax.set_axisbelow(True)
+    for sp in ("top", "right", "bottom"):
+        ax.spines[sp].set_visible(False)
+    ax.spines["left"].set_color(AXIS)
+    ax.tick_params(axis="x", length=0, colors=MUTED, labelsize=8.5); ax.tick_params(axis="y", length=0)
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, _: f"{x:g}%"))
+    ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+    fig.text(0.3 / w, 0.45 / hh, "Published numbers are copied from the cited papers (see literature_comparison.csv), not re-run here. "
+             "Models trained on Tongji saw Tongji palms in training; ours did not.", fontsize=8.5, color=MUTED, va="top")
+    save(fig, "tongji_vs_papers.png")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip", nargs="*", default=[], help="dataset:method entries to leave out, e.g. tongji:v3c")
@@ -230,3 +281,4 @@ if __name__ == "__main__":
     plot_accuracy(set(a.skip))
     plot_robustness()
     plot_size_speed()
+    plot_tongji_papers()

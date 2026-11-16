@@ -1,0 +1,9 @@
+[step] 14:32:59 A: Tongji, published protocol (all 10 images per session), v3c and v4 - started
+[step] 14:32:59 B1/5 PalmMatchDB
+[step] 15:06:43 B2/5 own photos
+[step] 15:07:11 B3/5 Gabor dataset
+[step] 15:20:30 B4/5 robustness
+[step] 16:02:52 B5/5 Tongji, benchmark protocol (3 images per session)
+[step] 17:25:32 B: finished, waiting for A
+[step] 17:30:09 A: Tongji published protocol - finished
+[step] 17:30:11 ALL DONE

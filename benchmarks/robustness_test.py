@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import palm_match as pm  # noqa: E402
 import palm_match_compact as pmc  # noqa: E402
 import palm_match_robust as pmr  # noqa: E402
+import palm_match_v5 as pm5  # noqa: E402
 import evaluate_palm_match as E  # noqa: E402
 
 
@@ -60,14 +61,15 @@ def main():
     ap.add_argument("--root", default=os.path.join(REPO, "data", "Tongji"))
     ap.add_argument("--ids", type=int, default=200)
     ap.add_argument("--impostors", type=int, default=1500)
-    ap.add_argument("--method", default="v3", choices=["v3", "v3c", "v3cr"])
+    ap.add_argument("--method", default="v3", choices=["v3", "v3c", "v3cr", "v5"])
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
     a.out = a.out or os.path.join(REPO, "benchmarks", "results",
                                   "robustness_tongji.json" if a.method == "v3" else f"robustness_tongji_{a.method}.json")
     feat, pfeat, match, thr = {"v3": (pm.features_v3, pm.features_v3, pm.match_v3, pm.V3_THRESHOLD),
                                "v3c": (pmc.features, pmc.features, pmc.match, pmc.THRESHOLD),
-                               "v3cr": (pmr.template_of_crop, pmr.probe_of_crop, pmr.match, pmr.THRESHOLD)}[a.method]
+                               "v3cr": (pmr.template_of_crop, pmr.probe_of_crop, pmr.match, pmr.THRESHOLD),
+                               "v5": (pm5.template_of_crop, pm5.probe_of_crop, pm5.match, pm5.THRESHOLD)}[a.method]
     samples, _, _ = E.ds_tongji(root=a.root, ids=a.ids, per_id=1)
     gray = {}
     for ident, name, path in samples:                       # one enrolled (session1) + one probe (session2) per palm

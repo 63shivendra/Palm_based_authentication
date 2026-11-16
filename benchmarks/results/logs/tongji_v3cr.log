@@ -1,0 +1,21 @@
+[tongji] 3600 images, 600 identities, hand detection off (ROI images), protocol cross-session
+Loaded LightGlue model
+
+=== tongji | method v3cr | protocol cross-session ===
+images 3600  usable 3600  identities 600  FTE 0.00% 
+comparisons: genuine 5400  impostor 10000
+at operating threshold (12.0 score): FMR 0.00%  FNMR 0.09%  |  system FAR 0.00%  FRR 0.09%
+EER 0.04% (at 8.6 score)   TAR@FMR=1e-2 99.96%  1e-3 99.96%  1e-4 n/a
+Rank-1 100.00% (10 probes, gallery 600)   d' 4.38   AUC 1.0000
+scores: genuine median 284.812 (worst 2.844)   impostor median 0.292 (most similar 10.312)   [2217.2 s]
+
+=== tongji | method v3cr | protocol cross-session, 3-photo enrolment (600 palms enrolled) ===
+images 3600  usable 3600  identities 600  FTE 0.00% 
+comparisons: genuine 1800  impostor 10000
+at operating threshold (12.0 score): FMR 0.01%  FNMR 0.00%  |  system FAR 0.01%  FRR 0.00%
+EER 0.00% (at 27.7 score)   TAR@FMR=1e-2 100.00%  1e-3 100.00%  1e-4 n/a
+Rank-1 n/a (0 probes, gallery 600)   d' 5.70   AUC 1.0000
+scores: genuine median 327.875 (worst 42.750)   impostor median 0.500 (most similar 12.688)   [6171.7 s]
+
+saved d:\PALM_payments\benchmarks\results/tongji.json and score/DET plots
+Note: claiming FAR <= 1e-5 needs >= 300,000 independent impostor comparisons (rule of 3).

@@ -1,8 +1,8 @@
 # Palm verification benchmark report
 
-Generated 2026-11-13 by `benchmarks/make_report.py` from the JSON files in this folder.
+Generated 2026-11-16 by `benchmarks/make_report.py` from the JSON files in this folder.
 
-Matcher: `palm_match.py` v3 (MediaPipe hand detection, own alignment and quality gates, DISK + LightGlue pretrained models used without any palm training, own pose-checked verification and coverage-weighted score). `v3c` is the compact-template variant in `palm_match_compact.py`. `v3cr` is v3c plus noise-adaptive smoothing and retry on failure, in `palm_match_robust.py`.
+Matcher: `palm_match.py` v3 (MediaPipe hand detection, own alignment and quality gates, DISK + LightGlue pretrained models used without any palm training, own pose-checked verification and coverage-weighted score). `v3c` is the compact-template variant in `palm_match_compact.py`. `v3cr` is v3c plus noise-adaptive smoothing and retry on failure, in `palm_match_robust.py`. `v5` (`palm_match_v5.py`) is v3cr with full-accuracy LightGlue, an affine geometric check and a confidence-weighted score, chosen on Tongji images 5-8, which the benchmark does not use. `Tongji, published protocol` uses all 10 images per palm per session, as the published papers do.
 
 ## 1. Test datasets
 
@@ -11,6 +11,7 @@ Matcher: `palm_match.py` v3 (MediaPipe hand detection, own alignment and quality
 | Tongji Contactless Palmprint | cslinzhang.github.io/ContactlessPalm (official ROI images) | No licence stated on the official page; treated as research-only. Used for evaluation only. | 600 palms, 2 sessions about 2 months apart, 12,000 pre-cropped 128x128 images; 3 images per palm per session used | enrol session 1, verify session 2 |
 | PalmMatchDB | huggingface.co/datasets/aspmirlab/PalmMatchDB | Apache-2.0 (Hugging Face tag). Consent terms not verified. | phone photos of whole hands; 10,528 files but only 531 distinct images; labels unreliable | all pairs, restricted to pairs with trustworthy labels (same palm: photos < 10 min apart; different palm: > 1 day apart) |
 | Palmprint Image Dataset with Gabor Filter (raw images) | data.mendeley.com/datasets/r8hxykxnk5 (version 2) | CC BY 4.0 | 15 people, 103 raw 128x128 palm crops | all pairs |
+| Tongji, published protocol | cslinzhang.github.io/ContactlessPalm (official ROI images) | No licence stated on the official page; treated as research-only. Used for evaluation only. | 600 palms, all 10 images per palm per session (12,000 images) | the protocol of the published papers: session 1 images enrolled, session 2 images verified, 1 photo per comparison |
 | Own phone photos | real palm images/ in this repository | own data | 4 photos: 3 of one right hand (2 sessions), 1 of the left hand | all pairs |
 
 Not tested:
@@ -30,23 +31,39 @@ Accuracy = share of all comparisons decided correctly at the operating threshold
 | Tongji Contactless Palmprint | v3, 3 enrolled photos | 1,800 / 30,000 | 100.00% | 0.00% | 0.00% | 0.00% | 100.00% | 100.00% | n/a | 0.00% |
 | Tongji Contactless Palmprint | v3c compact, 1 photo | 5,400 / 30,000 | 99.99% | 0.05% | 0.00% | 0.09% | 99.94% | 99.94% | 100.00% | 0.00% |
 | Tongji Contactless Palmprint | v3c compact, 3 photos | 1,800 / 30,000 | 99.99% | 0.00% | 0.01% | 0.00% | 100.00% | 100.00% | n/a | 0.00% |
+| Tongji Contactless Palmprint | v3cr robust, 1 photo | 5,400 / 10,000 | 99.97% | 0.04% | 0.00% | 0.09% | 99.96% | n/a | 100.00% | 0.00% |
+| Tongji Contactless Palmprint | v3cr robust, 3 photos | 1,800 / 10,000 | 99.99% | 0.00% | 0.01% | 0.00% | 100.00% | n/a | n/a | 0.00% |
+| Tongji Contactless Palmprint | v5, 1 photo | 5,400 / 10,000 | 99.97% | 0.06% | 0.00% | 0.09% | 99.96% | n/a | 100.00% | 0.00% |
+| Tongji Contactless Palmprint | v5, 3 photos | 1,800 / 10,000 | 100.00% | 0.00% | 0.00% | 0.00% | 100.00% | n/a | n/a | 0.00% |
 | Tongji Contactless Palmprint | v2 SIFT, 1 photo | 5,400 / 30,000 | 99.85% | 0.44% | 0.07% | 0.57% | 99.43% | 99.19% | 100.00% | 0.00% |
 | PalmMatchDB | v3, 1 enrolled photo | 453 / 11,372 | 99.86% | 1.32% | 0.00% | 6.67% | 97.57% | n/a | n/a | 3.26% |
 | PalmMatchDB | v3, 3 enrolled photos | 95 / 1,831 | 100.00% | 0.00% | 0.00% | 3.26% | n/a | n/a | n/a | 3.26% |
 | PalmMatchDB | v3c compact, 1 photo | 453 / 11,372 | 99.87% | 1.11% | 0.00% | 6.46% | 98.01% | n/a | n/a | 3.26% |
 | PalmMatchDB | v3c compact, 3 photos | 95 / 1,831 | 100.00% | 0.00% | 0.00% | 3.26% | n/a | n/a | n/a | 3.26% |
+| PalmMatchDB | v3cr robust, 1 photo | 453 / 11,372 | 99.87% | 1.32% | 0.00% | 6.46% | 98.01% | n/a | n/a | 3.26% |
+| PalmMatchDB | v3cr robust, 3 photos | 95 / 1,831 | 100.00% | 0.00% | 0.00% | 3.26% | n/a | n/a | n/a | 3.26% |
+| PalmMatchDB | v5, 1 photo | 473 / 12,458 | 99.89% | 1.69% | 0.00% | 3.41% | 98.10% | n/a | n/a | 0.47% |
+| PalmMatchDB | v5, 3 photos | 99 / 2,010 | 100.00% | 0.00% | 0.00% | 0.47% | n/a | n/a | n/a | 0.47% |
 | PalmMatchDB | v2 SIFT, 1 photo | 453 / 11,372 | 98.85% | 0.46% | 1.14% | 3.68% | 98.45% | n/a | n/a | 3.26% |
 | Palmprint Image Dataset with Gabor Filter (raw images) | v3, 1 enrolled photo | 311 / 4,942 | 99.83% | 0.29% | 0.00% | 2.89% | 99.36% | n/a | 100.00% | 0.00% |
 | Palmprint Image Dataset with Gabor Filter (raw images) | v3, 3 enrolled photos | 58 / 812 | 99.89% | 0.00% | 0.00% | 1.72% | n/a | n/a | n/a | 0.00% |
 | Palmprint Image Dataset with Gabor Filter (raw images) | v3c compact, 1 photo | 311 / 4,942 | 99.87% | 0.32% | 0.00% | 2.25% | 99.04% | n/a | 98.86% | 0.00% |
 | Palmprint Image Dataset with Gabor Filter (raw images) | v3c compact, 3 photos | 58 / 812 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | n/a | 0.00% |
+| Palmprint Image Dataset with Gabor Filter (raw images) | v3cr robust, 1 photo | 311 / 4,942 | 99.94% | 0.32% | 0.00% | 0.96% | 99.04% | n/a | 100.00% | 0.00% |
+| Palmprint Image Dataset with Gabor Filter (raw images) | v3cr robust, 3 photos | 58 / 812 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | n/a | 0.00% |
+| Palmprint Image Dataset with Gabor Filter (raw images) | v5, 1 photo | 311 / 4,942 | 99.81% | 0.32% | 0.00% | 3.22% | 99.04% | n/a | 98.86% | 0.00% |
+| Palmprint Image Dataset with Gabor Filter (raw images) | v5, 3 photos | 58 / 812 | 99.89% | 0.00% | 0.00% | 1.72% | n/a | n/a | n/a | 0.00% |
 | Palmprint Image Dataset with Gabor Filter (raw images) | v2 SIFT, 1 photo | 311 / 4,942 | 99.90% | 0.00% | 0.10% | 0.00% | 100.00% | n/a | 100.00% | 0.00% |
+| Tongji, published protocol | v3c compact, 1 photo | 60,000 / 20,000 | 99.92% | 0.08% | 0.01% | 0.10% | 99.92% | n/a | n/a | 0.00% |
+| Tongji, published protocol | v5, 1 photo | 60,000 / 20,000 | 99.92% | 0.05% | 0.00% | 0.11% | 99.96% | n/a | n/a | 0.00% |
 | Own phone photos | v3, 1 enrolled photo | 3 / 3 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | 100.00% | 0.00% |
 | Own phone photos | v3, 2 enrolled photos | 1 / 1 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | n/a | 0.00% |
 | Own phone photos | v3c compact, 1 photo | 3 / 3 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | 100.00% | 0.00% |
 | Own phone photos | v3c compact, 2 photos | 1 / 1 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | n/a | 0.00% |
 | Own phone photos | v3cr robust, 1 photo | 3 / 3 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | 100.00% | 0.00% |
 | Own phone photos | v3cr robust, 2 photos | 1 / 1 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | n/a | 0.00% |
+| Own phone photos | v5, 1 photo | 3 / 3 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | 100.00% | 0.00% |
+| Own phone photos | v5, 2 photos | 1 / 1 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | n/a | 0.00% |
 | Own phone photos | v2 SIFT, 1 photo | 3 / 3 | 100.00% | 0.00% | 0.00% | 0.00% | n/a | n/a | 100.00% | 0.00% |
 | Own phone photos | v1 CompCode, 1 photo | 3 / 3 | 50.00% | 33.33% | 0.00% | 100.00% | n/a | n/a | 100.00% | 0.00% |
 
@@ -54,7 +71,7 @@ Notes:
 
 - The v3 threshold (26) was set using Tongji, so v3 FAR and FRR on Tongji are optimistic. EER does not depend on the threshold.
 - The v3c threshold (12) was set from PalmMatchDB and the phone photos only. v3cr uses the same threshold; a retry must reach 1.5 times it.
-- v3cr on Tongji uses 10,000 impostor comparisons, not 30,000, because every failed comparison is retried three times.
+- v3cr and v5 on Tongji use 10,000 impostor comparisons, not 30,000, because every failed comparison is retried three times. The v5 threshold (10) was set on the development images.
 - `n/a` means the test has too few impostor comparisons to measure that false-accept level.
 - The largest test has 30,000 impostor comparisons, which supports FAR claims down to about 0.01%, not the 0.001% project target.
 - Tongji and the Gabor dataset are pre-cropped palms, so they do not exercise hand detection and alignment. Only PalmMatchDB and the phone photos test the whole chain.
@@ -115,6 +132,24 @@ Same test with v3cr (`palm_match_robust.py`: v3c plus noise-adaptive smoothing a
 | sensor noise (sigma 12) | 0.00% | 0.00% | 0.00% | 229 |
 | JPEG quality 20 | 0.00% | 0.00% | 0.00% | 217 |
 
+Same test with v5 (`palm_match_v5.py`: v3cr plus full-accuracy LightGlue, affine check and confidence-weighted score):
+
+| Probe condition | FRR | FAR | EER | Median genuine score |
+|---|---|---|---|---|
+| clean (baseline) | 0.00% | 0.00% | 0.00% | 197 |
+| darker (x0.5) | 0.00% | 0.00% | 0.00% | 192 |
+| brighter (x1.5) | 4.00% | 0.00% | 2.52% | 175 |
+| low contrast (x0.4) | 0.00% | 0.00% | 0.00% | 181 |
+| uneven light (gradient) | 0.50% | 0.00% | 0.00% | 175 |
+| blur (sigma 2) | 0.50% | 0.00% | 0.00% | 196 |
+| blur (sigma 4) | 1.00% | 0.00% | 0.52% | 116 |
+| rotation 10 deg | 0.00% | 0.00% | 0.00% | 200 |
+| rotation 20 deg | 0.00% | 0.00% | 0.00% | 194 |
+| closer (x1.15) | 0.00% | 0.00% | 0.00% | 150 |
+| farther (x0.85) | 0.00% | 0.00% | 0.00% | 165 |
+| sensor noise (sigma 12) | 0.50% | 0.00% | 0.00% | 118 |
+| JPEG quality 20 | 0.00% | 0.00% | 0.00% | 114 |
+
 The degradations are simulated on the cropped image, not captured with a camera. Pixel noise added at this resolution breaks matching; real photos need to be tested for this.
 
 ## 4. Inference latency
@@ -143,10 +178,23 @@ Published numbers are copied from the cited sources, not re-run here, and use di
 
 | Dataset | Method | EER | Trained on palm images | Protocol | Source |
 |---|---|---|---|---|---|
+| Tongji | **ours: v3c compact, 1 photo** | 0.08% | no (zero-shot) | cross-session | this repository |
+| Tongji | CCNet | 0.00004% | yes, on Tongji | closed-set, train and test split of Tongji | survey arXiv:2501.01166; arXiv:2504.11306 |
+| Tongji | BOCV | 0.0056% | no (hand-crafted) | within Tongji | survey tables found in the literature search |
+| Tongji | CompNet | 0.018 to 0.025% | yes, on Tongji | closed-set | arXiv:2501.01166 (0.018); arXiv:2504.11306 (0.025) |
+| Tongji | PalmNet | 0.03 to 0.17% | partly (Gabor/PCA filters tuned on palms) | within Tongji | survey tables found in the literature search |
+| Tongji | DHPN | 0.066% | yes | within Tongji | survey tables found in the literature search |
+| Tongji | DHN | 0.088% | yes | within Tongji | survey tables found in the literature search |
+| Tongji | CompCode | 0.10 to 0.11% | no (hand-crafted) | within Tongji | arXiv:2504.11306 and survey tables |
+| Tongji | CCNet, trained on PolyU | 2.22% | yes, on another dataset | cross-dataset (PolyU to Tongji) | survey arXiv:2501.01166 |
+| Tongji | PalmBridge, trained on PolyU | 2.25% | yes, on another dataset | cross-dataset open-set | arXiv:2601.20351 |
+| Tongji | PalmBridge, trained on IITD | 2.88% | yes, on another dataset | cross-dataset open-set | arXiv:2601.20351 |
 | Tongji | **ours: v3, 1 enrolled photo** | 0.06% | no (zero-shot) | cross-session | this repository |
 | Tongji | **ours: v3, 3 enrolled photos** | 0.00% | no (zero-shot) | cross-session, 3-photo enrolment (600 palms enrolled) | this repository |
 | Tongji | **ours: v3c compact, 1 photo** | 0.05% | no (zero-shot) | cross-session | this repository |
 | Tongji | **ours: v3c compact, 3 photos** | 0.00% | no (zero-shot) | cross-session, 3-photo enrolment (600 palms enrolled) | this repository |
+| Tongji | **ours: v3cr robust, 1 photo** | 0.04% | no (zero-shot) | cross-session | this repository |
+| Tongji | **ours: v3cr robust, 3 photos** | 0.00% | no (zero-shot) | cross-session, 3-photo enrolment (600 palms enrolled) | this repository |
 | Tongji | CCNet | 0.00004% | yes, on Tongji | closed-set, train and test split of Tongji | survey arXiv:2501.01166; arXiv:2504.11306 |
 | Tongji | BOCV | 0.0056% | no (hand-crafted) | within Tongji | survey tables found in the literature search |
 | Tongji | CompNet | 0.018 to 0.025% | yes, on Tongji | closed-set | arXiv:2501.01166 (0.018); arXiv:2504.11306 (0.025) |
@@ -161,12 +209,16 @@ Published numbers are copied from the cited sources, not re-run here, and use di
 | PalmMatchDB | **ours: v3, 3 enrolled photos** | 0.00% | no (zero-shot) | all-vs-all (trusted-label pairs), 3-photo enrolment (36 palms enrolled) | this repository |
 | PalmMatchDB | **ours: v3c compact, 1 photo** | 1.11% | no (zero-shot) | all-vs-all (trusted-label pairs) | this repository |
 | PalmMatchDB | **ours: v3c compact, 3 photos** | 0.00% | no (zero-shot) | all-vs-all (trusted-label pairs), 3-photo enrolment (36 palms enrolled) | this repository |
-| PalmMatchDB | no published EER found | - | - | The dataset paper (Alausa et al., ICPECA 2023, IEEE Xplore 10076097) is paywalled; its results could not be read. No other paper reporting on this dataset was found. | web search, 2026-11-13 |
+| PalmMatchDB | **ours: v3cr robust, 1 photo** | 1.32% | no (zero-shot) | all-vs-all (trusted-label pairs) | this repository |
+| PalmMatchDB | **ours: v3cr robust, 3 photos** | 0.00% | no (zero-shot) | all-vs-all (trusted-label pairs), 3-photo enrolment (36 palms enrolled) | this repository |
+| PalmMatchDB | no published EER found | - | - | The dataset paper (Alausa et al., ICPECA 2023, IEEE Xplore 10076097) is paywalled; its results could not be read. No other paper reporting on this dataset was found. | web search, 2026-11-16 |
 | Palmprint Image Dataset with Gabor Filter | **ours: v3, 1 enrolled photo** | 0.29% | no (zero-shot) | all-vs-all | this repository |
 | Palmprint Image Dataset with Gabor Filter | **ours: v3, 3 enrolled photos** | 0.00% | no (zero-shot) | all-vs-all, 3-photo enrolment (15 palms enrolled) | this repository |
 | Palmprint Image Dataset with Gabor Filter | **ours: v3c compact, 1 photo** | 0.32% | no (zero-shot) | all-vs-all | this repository |
 | Palmprint Image Dataset with Gabor Filter | **ours: v3c compact, 3 photos** | 0.00% | no (zero-shot) | all-vs-all, 3-photo enrolment (15 palms enrolled) | this repository |
-| Palmprint Image Dataset with Gabor Filter | no published result found | - | - | Mendeley Data record only; no paper reporting verification results on it was found. | web search, 2026-11-13 |
+| Palmprint Image Dataset with Gabor Filter | **ours: v3cr robust, 1 photo** | 0.32% | no (zero-shot) | all-vs-all | this repository |
+| Palmprint Image Dataset with Gabor Filter | **ours: v3cr robust, 3 photos** | 0.00% | no (zero-shot) | all-vs-all, 3-photo enrolment (15 palms enrolled) | this repository |
+| Palmprint Image Dataset with Gabor Filter | no published result found | - | - | Mendeley Data record only; no paper reporting verification results on it was found. | web search, 2026-11-16 |
 
 ## 7. Files
 
@@ -177,4 +229,4 @@ Published numbers are copied from the cited sources, not re-run here, and use di
 - `plots/accuracy.png`, `plots/robustness.png`, `plots/size_speed.png`: summary charts (`benchmarks/plot_results.py`)
 - `logs/`: console output of each run; `*.json`: raw results; `*.png`: score histograms and DET curves
 
-Re-run v3 and v3c with `bash benchmarks/run_all.sh`, and v3cr with `bash benchmarks/run_robust.sh`.
+Re-run v3 and v3c with `bash benchmarks/run_all.sh`, v3cr with `bash benchmarks/run_robust.sh`, and v5 with `bash benchmarks/run_v5.sh`.

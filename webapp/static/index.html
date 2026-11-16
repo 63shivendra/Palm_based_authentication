@@ -11,7 +11,7 @@
   --line: #e1e0d9; --track: #ecebe6; --accent: #1f5fb0; --accent-ink: #ffffff;
   --good: #0ca30c; --good-ink: #006300; --good-wash: #e6f5e6; --bad: #d03b3b; --bad-ink: #a32222; --bad-wash: #fbe9e9;
   --warn-wash: #fff4d6; --warn-ink: #6b4a00;
-  --v3: #2a78d6; --v3c: #eb6834; --v3cr: #1baf7a;
+  --v3: #2a78d6; --v3c: #eb6834; --v3cr: #1baf7a; --v5: #6250d6;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -19,7 +19,7 @@
     --line: #2c2c2a; --track: #2c2c2a; --accent: #3987e5; --accent-ink: #0b0b0b;
     --good: #0ca30c; --good-ink: #5ed05e; --good-wash: #12301a; --bad: #e66767; --bad-ink: #f09a9a; --bad-wash: #3a1818;
     --warn-wash: #3a2f10; --warn-ink: #f2d27a;
-    --v3: #3987e5; --v3c: #d95926; --v3cr: #199e70;
+    --v3: #3987e5; --v3c: #d95926; --v3cr: #199e70; --v5: #9085e9;
   }
 }
 * { box-sizing: border-box; }
@@ -38,7 +38,7 @@ header .sub { color: var(--ink2); font-size: 13.5px; }
 .rows { margin-top: 6px; display: grid; gap: 3px; font-size: 13.5px; }
 .rows div { display: flex; justify-content: space-between; gap: 8px; }
 .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; }
-.dot.v3 { background: var(--v3); } .dot.v3c { background: var(--v3c); } .dot.v3cr { background: var(--v3cr); }
+.dot.v3 { background: var(--v3); } .dot.v3c { background: var(--v3c); } .dot.v3cr { background: var(--v3cr); } .dot.v5 { background: var(--v5); }
 .main { display: grid; grid-template-columns: minmax(300px, 400px) minmax(0, 1fr); gap: 16px; align-items: start; }
 .seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--track); border-radius: 9px; padding: 3px; margin-bottom: 12px; }
 .seg button { border: 0; background: transparent; color: var(--ink2); padding: 7px; border-radius: 7px; font: inherit; cursor: pointer; }
@@ -67,7 +67,7 @@ button.link { border: 0; background: none; color: var(--accent); font: inherit; 
 .resulthead .t { font-size: 17px; font-weight: 650; margin-bottom: 6px; }
 .facts { display: grid; grid-template-columns: auto auto; gap: 2px 18px; font-size: 13.5px; color: var(--ink2); width: fit-content; }
 .facts b { color: var(--ink); font-weight: 600; }
-.models { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.models { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
 .model { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
 .model .name { font-weight: 650; } .model .detail { color: var(--muted); font-size: 12.5px; margin-bottom: 10px; }
 .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-weight: 650; font-size: 13.5px; }
@@ -143,7 +143,7 @@ tr.claimed td { font-weight: 600; }
 
     <section class="card" aria-label="Result">
       <h2>Result</h2>
-      <div id="result"><div class="empty">Enrol a person, then verify a photo. The decision of all three versions appears here.</div></div>
+      <div id="result"><div class="empty">Enrol a person, then verify a photo. The decision of every version appears here.</div></div>
     </section>
   </div>
 
@@ -256,7 +256,7 @@ function showVerify(j) {
       <div class="meter" role="img" aria-label="score ${fmt(r.score)}, threshold ${r.threshold}"><i style="width:${w}%;background:${r.match ? 'var(--good)' : 'var(--muted)'}"></i><span class="tick"></span></div>
       <div class="meterlabel"><span>0</span><span>threshold ${r.threshold}</span><span>${fmt(4 * r.threshold)}+</span></div>
       <div class="kv"><span>Matched points</span><b>${r.inliers}</b><span>Palm area covered</span><b>${r.cells} of 64 cells</b>
-        <span>Best enrolled photo</span><b>photo ${r.photo}</b>${m.key === 'v3cr' ? `<span>Decided on</span><b>${esc(r.attempt)}</b>` : ''}
+        <span>Best enrolled photo</span><b>photo ${r.photo}</b>${m.key === 'v3cr' || m.key === 'v5' ? `<span>Decided on</span><b>${esc(r.attempt)}</b>` : ''}
         <span>Time (extract + match)</span><b>${r.extract_ms} + ${r.match_ms} ms</b>
         <span>Template per photo</span><b>${person ? kb(person.bytes[m.key] / person.photos) : ''}</b></div></div>`;
   }).join('');
@@ -266,7 +266,7 @@ function showVerify(j) {
       <div><div class="t">Verified against ${esc(j.person)}</div>${quality(j.quality)}<div class="hint" style="margin-top:6px">Whole request: ${fmt(j.total_ms)} ms</div></div></div>
     <div class="models">${cards}</div>${others}`;
   const yes = S.models.filter(m => j.results[m.key].match).length;
-  say(yes === S.models.length ? 'ok' : yes ? 'info' : 'err', yes === S.models.length ? `All three versions say MATCH for ${j.person}.` : yes ? `${yes} of ${S.models.length} versions say MATCH for ${j.person}.` : `All three versions say NO MATCH for ${j.person}.`);
+  say(yes === S.models.length ? 'ok' : yes ? 'info' : 'err', yes === S.models.length ? `All ${S.models.length} versions say MATCH for ${j.person}.` : yes ? `${yes} of ${S.models.length} versions say MATCH for ${j.person}.` : `All ${S.models.length} versions say NO MATCH for ${j.person}.`);
 }
 
 function showEnrol(j) {

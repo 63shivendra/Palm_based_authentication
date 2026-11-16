@@ -14,6 +14,7 @@ from export_csv import DATASETS, LITERATURE, NOT_TESTED, OURS_FOR_LITERATURE  # 
 METHODS = [("v3", "v3, 1 enrolled photo"), ("v3_enrol3", "v3, 3 enrolled photos"), ("v3_enrol2", "v3, 2 enrolled photos"),
            ("v3c", "v3c compact, 1 photo"), ("v3c_enrol3", "v3c compact, 3 photos"), ("v3c_enrol2", "v3c compact, 2 photos"),
            ("v3cr", "v3cr robust, 1 photo"), ("v3cr_enrol3", "v3cr robust, 3 photos"), ("v3cr_enrol2", "v3cr robust, 2 photos"),
+           ("v5", "v5, 1 photo"), ("v5_enrol3", "v5, 3 photos"), ("v5_enrol2", "v5, 2 photos"),
            ("v2", "v2 SIFT, 1 photo"), ("v1", "v1 CompCode, 1 photo")]
 
 
@@ -31,7 +32,9 @@ out = [f"# Palm verification benchmark report", "",
        "Matcher: `palm_match.py` v3 (MediaPipe hand detection, own alignment and quality gates, DISK + LightGlue "
        "pretrained models used without any palm training, own pose-checked verification and coverage-weighted score). "
        "`v3c` is the compact-template variant in `palm_match_compact.py`. `v3cr` is v3c plus noise-adaptive smoothing "
-        "and retry on failure, in `palm_match_robust.py`.", "",
+        "and retry on failure, in `palm_match_robust.py`. `v5` (`palm_match_v5.py`) is v3cr with full-accuracy LightGlue, "
+        "an affine geometric check and a confidence-weighted score, chosen on Tongji images 5-8, which the benchmark does not use. "
+        "`Tongji, published protocol` uses all 10 images per palm per session, as the published papers do.", "",
        "## 1. Test datasets", "",
        "| Dataset | Source | Licence | Content used | Protocol |", "|---|---|---|---|---|"]
 for key, name, src, lic, what, proto in DATASETS:
@@ -61,7 +64,8 @@ out += ["", "Notes:", "",
         "- The v3 threshold (26) was set using Tongji, so v3 FAR and FRR on Tongji are optimistic. EER does not depend on the threshold.",
         "- The v3c threshold (12) was set from PalmMatchDB and the phone photos only. v3cr uses the same threshold; "
         "a retry must reach 1.5 times it.",
-        "- v3cr on Tongji uses 10,000 impostor comparisons, not 30,000, because every failed comparison is retried three times.",
+        "- v3cr and v5 on Tongji use 10,000 impostor comparisons, not 30,000, because every failed comparison is retried three times. "
+        "The v5 threshold (10) was set on the development images.",
         "- `n/a` means the test has too few impostor comparisons to measure that false-accept level.",
         "- The largest test has 30,000 impostor comparisons, which supports FAR claims down to about 0.01%, not the 0.001% project target.",
         "- Tongji and the Gabor dataset are pre-cropped palms, so they do not exercise hand detection and alignment. "
@@ -77,7 +81,9 @@ if rb:
     out += [f"| {k} | {pct(v['FRR'])} | {pct(v['FAR'])} | {pct(v['EER'])} | {v['genuine_median']:.0f} |" for k, v in rb.items()]
     for name, title in (("robustness_tongji_v3c", "Same test with the compact template (v3c):"),
                         ("robustness_tongji_v3cr", "Same test with v3cr (`palm_match_robust.py`: v3c plus noise-adaptive "
-                         "smoothing and retry on failure). The additions were chosen on palms 300-499; this test uses palms 0-199:")):
+                         "smoothing and retry on failure). The additions were chosen on palms 300-499; this test uses palms 0-199:"),
+                        ("robustness_tongji_v5", "Same test with v5 (`palm_match_v5.py`: v3cr plus full-accuracy LightGlue, "
+                         "affine check and confidence-weighted score):")):
         rc = load(name)
         if rc:
             out += ["", title, "", "| Probe condition | FRR | FAR | EER | Median genuine score |", "|---|---|---|---|---|"]
@@ -113,6 +119,6 @@ out += ["", "## 7. Files", "",
         "- `benchmark_scores.csv`: the score of every single comparison",
         "- `plots/accuracy.png`, `plots/robustness.png`, `plots/size_speed.png`: summary charts (`benchmarks/plot_results.py`)",
         "- `logs/`: console output of each run; `*.json`: raw results; `*.png`: score histograms and DET curves",
-        "", "Re-run v3 and v3c with `bash benchmarks/run_all.sh`, and v3cr with `bash benchmarks/run_robust.sh`."]
+        "", "Re-run v3 and v3c with `bash benchmarks/run_all.sh`, v3cr with `bash benchmarks/run_robust.sh`, and v5 with `bash benchmarks/run_v5.sh`."]
 open(os.path.join(R, "REPORT.md"), "w", encoding="utf-8").write("\n".join(out) + "\n")
 print("wrote", os.path.join(R, "REPORT.md"), len(out), "lines")

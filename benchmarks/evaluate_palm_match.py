@@ -8,6 +8,7 @@ ISO/IEC 19795-1 style evaluation of training-free palm matchers on several palm 
   v3 = same alignment, then DISK keypoints + LightGlue transformer matcher (pretrained, zero-shot; needs kornia)
   v3c = v3 with the compact template of palm_match_compact.py (1,024 keypoints, 1-byte descriptors)
   v3cr = v3c with noise-adaptive smoothing and retry on failure (palm_match_robust.py)
+  v5   = v3cr with full-accuracy LightGlue, affine check and confidence-weighted score (palm_match_v5.py)
 
 Datasets (--dataset):
   real        real palm images/  (flat folder; 1000132768 is the LEFT hand, the rest the right hand)
@@ -57,6 +58,7 @@ sys.path.insert(0, REPO)
 import palm_match as pm  # noqa: E402
 import palm_match_compact as pmc  # noqa: E402
 import palm_match_robust as pmr  # noqa: E402
+import palm_match_v5 as pm5  # noqa: E402
 
 IMG_EXT = (".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff")
 
@@ -195,6 +197,8 @@ def extract(sample, method, detect):
     img = sample[2]
     if isinstance(img, str):
         img = load_any(img)
+    if method == "v5":
+        return pm5.make_probe(img, detect)
     if method == "v3cr":                            # [first attempt, retries...]; [0] is also the enrolment template
         return pmr.make_probe(img, detect)
     if method == "v3c":
@@ -256,6 +260,8 @@ class V3Scorer:
 
 
 def make_scorer(method, feats):
+    if method == "v5":
+        return lambda a, b: float(pm5.match(feats[a][0], feats[b])["score"])
     if method == "v3cr":
         return lambda a, b: float(pmr.match(feats[a][0], feats[b])["score"])
     if method == "v3c":                             # unpack once, then the same matcher as v3
@@ -371,11 +377,31 @@ def evaluate_enrol(keep, ids, sess, ts, score, n_enrol, protocol, trusted, max_i
     return (np.array([sc(k, p) for k, p in gen]), np.array([sc(k, p) for k, p in imp]), len(enrol))
 
 
+class Progress:
+    """Prints '[stage] 45% (1,234/2,700) elapsed 3m10s, about 4m left' to stderr about every 5%."""
+
+    def __init__(self, label, total):
+        self.label, self.total, self.t0, self.next = label, max(total, 1), time.time(), 0.05
+
+    def tick(self, done):
+        f = done / self.total
+        if f >= self.next or done == self.total:
+            el = time.time() - self.t0
+            left = el / max(f, 1e-9) - el
+            fmt = lambda x: f"{int(x // 60)}m{int(x % 60):02d}s"
+            print(f"[progress] {self.label}: {f * 100:3.0f}% ({done:,}/{self.total:,}) elapsed {fmt(el)}, about {fmt(left)} left",
+                  file=sys.stderr, flush=True)
+            while self.next <= f:
+                self.next += 0.05
+
+
 def evaluate(samples, method, detect, protocol, threshold, max_imp, seed, max_probes=150, trusted=False,
              n_enrol=1):
     t0 = time.time()
     feats, keep, fte = [], [], collections.Counter()
-    for s in samples:
+    pg = Progress(f"{method} features", len(samples))
+    for k, s in enumerate(samples, 1):
+        pg.tick(k)
         try:
             feats.append(extract(s, method, detect))
             keep.append(s)
@@ -406,8 +432,12 @@ def evaluate(samples, method, detect, protocol, threshold, max_imp, seed, max_pr
         imp_pairs = [(a, b) for a, b in imp_pairs if abs(ts[a] - ts[b]) >= TRUST_DIFF]
     if len(imp_pairs) > max_imp:
         imp_pairs = random.Random(seed).sample(imp_pairs, max_imp)
-    gen = np.array([score(a, b) for a, b in gen_pairs])
-    imp = np.array([score(a, b) for a, b in imp_pairs])
+    pg = Progress(f"{method} comparisons", len(gen_pairs) + len(imp_pairs))
+    allp = gen_pairs + imp_pairs
+    sc = []
+    for k, (a, b) in enumerate(allp, 1):
+        sc.append(score(a, b)); pg.tick(k)
+    gen, imp = np.array(sc[:len(gen_pairs)]), np.array(sc[len(gen_pairs):])
     if len(gen) == 0 or len(imp) == 0:
         return dict(error="not enough usable images for genuine and impostor comparisons", fte=dict(fte))
 
@@ -429,7 +459,7 @@ def evaluate(samples, method, detect, protocol, threshold, max_imp, seed, max_pr
         hits += right > max(v for k, v in sc.items() if k != ids[p]) if len(sc) > 1 else 0
 
     if threshold is None:
-        threshold = {"v2": pm.MIN_INLIERS, "v3": pm.V3_THRESHOLD, "v3c": pmc.THRESHOLD, "v3cr": pmr.THRESHOLD}.get(method, -pm.DEFAULT_THRESHOLD)
+        threshold = {"v2": pm.MIN_INLIERS, "v3": pm.V3_THRESHOLD, "v3c": pmc.THRESHOLD, "v3cr": pmr.THRESHOLD, "v5": pm5.THRESHOLD}.get(method, -pm.DEFAULT_THRESHOLD)
     fta = n_fte / max(len(samples), 1)
     base = dict(method=method, protocol=protocol + (" (trusted-label pairs)" if trusted else ""),
                 images=len(samples), usable=len(keep), identities=len(set(ids)),
@@ -460,7 +490,7 @@ def print_report(name, r):
     print(f"\n=== {name} | method {r['method']} | protocol {r['protocol']} ===")
     print(f"images {r['images']}  usable {r['usable']}  identities {r['identities']}  FTE {fmt(r['fte_rate'])} {r['fte_reasons'] or ''}")
     print(f"comparisons: genuine {r['genuine_comparisons']}  impostor {r['impostor_comparisons']}")
-    unit = {"v3": "score", "v3c": "score", "v3cr": "score", "v2": "inliers"}.get(r['method'])
+    unit = {"v3": "score", "v3c": "score", "v3cr": "score", "v5": "score", "v2": "inliers"}.get(r['method'])
     thr = f"{r['threshold']:.1f} {unit}" if unit else f"distance {-r['threshold']:.3f}"
     print(f"at operating threshold ({thr}): FMR {fmt(r['FMR'])}  FNMR {fmt(r['FNMR'])}  |  system FAR {fmt(r['FAR'])}  FRR {fmt(r['FRR'])}")
     et = f"{r['EER_threshold']:.1f} {unit}" if unit else f"distance {-r['EER_threshold']:.3f}"
@@ -495,7 +525,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dataset", required=True, choices=sorted(LOADERS))
     ap.add_argument("--root", default=None)
-    ap.add_argument("--methods", nargs="+", default=["v3"], choices=["v1", "v2", "v3", "v3c", "v3cr"])
+    ap.add_argument("--methods", nargs="+", default=["v3"], choices=["v1", "v2", "v3", "v3c", "v3cr", "v5"])
     ap.add_argument("--enrol", type=int, default=1, help="also report N-photo enrolment (e.g. 3)")
     ap.add_argument("--all-pairs", action="store_true",
                     help="palmmatchdb: use raw labels (default keeps only trustworthy-label pairs)")
